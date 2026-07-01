@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Green Studio{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="header header--over-hero" id="siteHeader">
+        <div class="header__bar">
+            <a href="{% url 'home' %}" class="logo">
+                <span class="logo__pulse"></span>
+                Green Studio
+            </a>
+            <div class="header__contacts">
+                <a href="tel:+79050006417" class="header__phone">+7 905 000 64 17</a>
+                <span class="header__address">ул. Артема 151</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer__inner">
+            <span class="footer__name">Green Studio</span>
+            <div class="footer__row">
+                <a href="tel:+79050006417">+7 905 000 64 17</a>
+                <span class="footer__dot"></span>
+                <span>ул. Артема 151, этаж 2</span>
+                <span class="footer__dot"></span>
+                <span>Пн – Пт 9:00 – 21:00</span>
+            </div>
+            <span class="footer__copy">&copy; 2026</span>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

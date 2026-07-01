@@ -1,0 +1,99 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Запись — Aroma Coffee{% endblock %}
+
+{% block content %}
+<section class="booking-page">
+    <div class="container">
+        <div class="booking-layout">
+            <aside class="booking-aside">
+                <span class="section__label">Бронирование</span>
+                <h1 class="booking-aside__title">Забронируй столик</h1>
+                <p class="booking-aside__text">
+                    Заполни форму — мы перезвоним для подтверждения.
+                    Бронь бесплатная, оплата только за заказ.
+                </p>
+                <ul class="info-list">
+                    <li>
+                        <span class="info-list__icon">📍</span>
+                        ул. Кофейная, 12
+                    </li>
+                    <li>
+                        <span class="info-list__icon">🕐</span>
+                        Пн–Вс: 8:00 – 22:00
+                    </li>
+                    <li>
+                        <span class="info-list__icon">📞</span>
+                        +7 (999) 123-45-67
+                    </li>
+                    <li>
+                        <span class="info-list__icon">👥</span>
+                        До 20 гостей за столик
+                    </li>
+                </ul>
+            </aside>
+
+            <div class="booking-form-panel">
+                <h2 class="booking-form-panel__title">Форма записи</h2>
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label for="name">Имя *</label>
+                        <input type="text" id="name" name="name" required placeholder="Иван Иванов">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Телефон *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="+7 999 123-45-67">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="email@example.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date">Дата *</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="time">Время *</label>
+                            <input type="time" id="time" name="time" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guests">Гостей</label>
+                        <select id="guests" name="guests">
+                            <option value="1">1 гость</option>
+                            <option value="2" selected>2 гостя</option>
+                            <option value="3">3 гостя</option>
+                            <option value="4">4 гостя</option>
+                            <option value="5">5 гостей</option>
+                            <option value="6">6 гостей</option>
+                            <option value="8">8 гостей</option>
+                            <option value="10">10 гостей</option>
+                            <option value="15">15 гостей</option>
+                            <option value="20">20 гостей</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comment">Комментарий</label>
+                        <textarea id="comment" name="comment" placeholder="Повод, пожелания, аллергии..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn--accent btn--full">Отправить заявку</button>
+                    <div class="form-message" id="formMessage"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/booking.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+
+{% block title %}О нас — Aroma Coffee{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <div class="container page-hero__inner">
+        <h1 class="page-hero__title">О нас</h1>
+        <p class="page-hero__meta">История, которая началась с одной идеальной чашки эспрессо</p>
+    </div>
+</div>
+
+<section class="section section--dark">
+    <div class="container">
+        <div class="about-layout">
+            <div class="about-layout__visual">
+                <span class="about-layout__visual-emoji">☕</span>
+                <span class="about-layout__visual-text">Since 2018</span>
+            </div>
+            <div class="about-layout__content">
+                <span class="section__label">Наша история</span>
+                <h2 class="section__title">Aroma Coffee</h2>
+                <p>
+                    Мы открылись в 2018 году с простой идеей: создать место, где каждый
+                    гость чувствует себя как дома. Начав с крошечной кофейни на 20 мест,
+                    сегодня мы — точка притяжения для тысяч горожан.
+                </p>
+                <p>
+                    Наши бариста проходят специальное обучение и участвуют в чемпионатах.
+                    Работаем только с проверенными поставщиками зелёного кофе из
+                    Эфиопии, Колумбии и Бразилии.
+                </p>
+                <p>
+                    В Aroma Coffee можно поработать за ноутбуком, встретиться с друзьями
+                    или просто насладиться тишиной с книгой и ароматным латте.
+                </p>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-box__num">8+</div>
+                        <div class="stat-box__label">Лет работы</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-box__num">50+</div>
+                        <div class="stat-box__label">Напитков</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-box__num">12k</div>
+                        <div class="stat-box__label">Гостей / мес</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
