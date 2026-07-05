@@ -1,0 +1,44 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}Теги{% endblock %}
+
+{% block content %}
+<div class="panel-head">
+    <h1 class="panel-h1">Теги меню</h1>
+    <a href="{% url 'panel_menu_list' %}" class="panel-btn">← Меню</a>
+</div>
+<p class="panel-hint">Теги показываются на карточках меню на сайте. Привязывайте их при редактировании позиции.</p>
+
+<form method="post" class="panel-form panel-form--inline">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="panel-btn panel-btn--primary">Добавить</button>
+</form>
+
+<table class="panel-table">
+    <thead>
+        <tr><th>Тег</th><th>Позиций</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for tag in tags %}
+        <tr>
+            <td><span class="panel-tag-chip">{{ tag.name }}</span></td>
+            <td>{{ tag.item_count }}</td>
+            <td>
+                {% if tag.item_count == 0 %}
+                <form method="post" class="panel-inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete" value="{{ tag.pk }}">
+                    <button type="submit" class="panel-link-btn" onclick="return confirm('Удалить тег?')">Удалить</button>
+                </form>
+                {% else %}
+                <span class="panel-muted">в меню</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">Тегов пока нет.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

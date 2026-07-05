@@ -19,9 +19,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-admin.site.site_header = 'Green Studio — Админ-панель'
+admin.site.site_header = 'Green Studio'
 admin.site.site_title = 'Green Studio'
-admin.site.index_title = 'Управление сайтом'
+admin.site.index_title = 'Управление контентом сайта'
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -1,37 +1,91 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Booking, Category, GallerySlide, MenuItem
+from .models import Booking, Category, GallerySlide, MenuItem, MosaicPhoto, Promotion, SiteImage
 
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'order', 'items_count')
-    prepopulated_fields = {'slug': ('name',)}
-    ordering = ('order', 'name')
-
-    @admin.display(description='Позиций')
-    def items_count(self, obj):
-        return obj.items.count()
-
-
-@admin.register(MenuItem)
-class MenuItemAdmin(admin.ModelAdmin):
-    list_display = (
-        'emoji_preview',
-        'name',
-        'category',
-        'price',
-        'is_popular',
-        'is_available',
+def image_preview_field(url, height=56, width=84):
+    return format_html(
+        '<img src="{}" style="height:{}px;width:{}px;object-fit:cover;border-radius:4px">',
+        url, height, width,
     )
-    list_filter = ('category', 'is_popular', 'is_available')
-    search_fields = ('name', 'description')
-    list_editable = ('price', 'is_popular', 'is_available')
 
-    @admin.display(description='')
-    def emoji_preview(self, obj):
-        return format_html('<span style="font-size:1.4rem">{}</span>', obj.image_emoji)
+
+@admin.register(SiteImage)
+class SiteImageAdmin(admin.ModelAdmin):
+    list_display = ('key', 'image_preview', 'alt_text', 'updated_at')
+    readonly_fields = ('image_preview_large', 'updated_at')
+    fields = ('key', 'image', 'image_preview_large', 'alt_text', 'updated_at')
+
+    @admin.display(description='Превью')
+    def image_preview(self, obj):
+        if obj.image:
+            return image_preview_field(obj.image.url)
+        return '—'
+
+    @admin.display(description='Превью')
+    def image_preview_large(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width:360px;max-height:200px;object-fit:cover;border-radius:6px">',
+                obj.image.url,
+            )
+        return '—'
+
+
+@admin.register(MosaicPhoto)
+class MosaicPhotoAdmin(admin.ModelAdmin):
+    list_display = ('slot', 'image_preview', 'alt_text', 'is_active', 'updated_at')
+    list_editable = ('is_active',)
+    list_filter = ('is_active',)
+    ordering = ('slot',)
+    readonly_fields = ('image_preview_large', 'updated_at')
+    fields = ('slot', 'image', 'image_preview_large', 'alt_text', 'is_active', 'updated_at')
+
+    @admin.display(description='Превью')
+    def image_preview(self, obj):
+        if obj.image:
+            return image_preview_field(obj.image.url, 48, 64)
+        return '—'
+
+    @admin.display(description='Превью')
+    def image_preview_large(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width:320px;max-height:240px;object-fit:cover;border-radius:6px">',
+                obj.image.url,
+            )
+        return '—'
+
+
+@admin.register(Promotion)
+class PromotionAdmin(admin.ModelAdmin):
+    list_display = ('image_preview', 'title', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'text')
+    ordering = ('order', '-created_at')
+    readonly_fields = ('image_preview_large', 'created_at')
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'text', 'image', 'image_preview_large', 'order', 'is_active', 'created_at'),
+        }),
+    )
+
+    @admin.display(description='Фото')
+    def image_preview(self, obj):
+        if obj.image:
+            return image_preview_field(obj.image.url)
+        return '—'
+
+    @admin.display(description='Превью')
+    def image_preview_large(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width:360px;max-height:220px;object-fit:cover;border-radius:6px">',
+                obj.image.url,
+            )
+        return '—'
 
 
 @admin.register(GallerySlide)
@@ -41,12 +95,77 @@ class GallerySlideAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
     search_fields = ('title',)
     ordering = ('order', '-created_at')
+    fieldsets = (
+        (None, {
+            'fields': ('image', 'title', 'order', 'is_active'),
+        }),
+    )
 
-    @admin.display(description='Превью')
+    @admin.display(description='Фото')
+    def image_preview(self, obj):
+        if obj.image:
+            return image_preview_field(obj.image.url)
+        return '—'
+
+
+class MenuItemInline(admin.TabularInline):
+    model = MenuItem
+    extra = 0
+    fields = ('name', 'price', 'image', 'order', 'is_popular', 'is_available')
+    ordering = ('order', 'name')
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'order', 'items_count')
+    prepopulated_fields = {'slug': ('name',)}
+    ordering = ('order', 'name')
+    inlines = [MenuItemInline]
+
+    @admin.display(description='Позиций')
+    def items_count(self, obj):
+        return obj.items.count()
+
+
+@admin.register(MenuItem)
+class MenuItemAdmin(admin.ModelAdmin):
+    list_display = (
+        'image_preview',
+        'name',
+        'category',
+        'price',
+        'order',
+        'is_popular',
+        'is_available',
+    )
+    list_filter = ('category', 'is_popular', 'is_available')
+    search_fields = ('name', 'description')
+    list_editable = ('price', 'order', 'is_popular', 'is_available')
+    ordering = ('category', 'order', 'name')
+    readonly_fields = ('image_preview_large',)
+    fieldsets = (
+        (None, {
+            'fields': ('category', 'name', 'description', 'price', 'image', 'image_preview_large', 'order'),
+        }),
+        ('Настройки', {
+            'fields': ('is_popular', 'is_available'),
+        }),
+    )
+
+    @admin.display(description='Фото')
     def image_preview(self, obj):
         if obj.image:
             return format_html(
-                '<img src="{}" style="height:60px;width:90px;object-fit:cover;border-radius:4px">',
+                '<img src="{}" style="height:48px;width:48px;object-fit:cover;border-radius:50%">',
+                obj.image.url,
+            )
+        return '—'
+
+    @admin.display(description='Превью')
+    def image_preview_large(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width:200px;max-height:200px;object-fit:cover;border-radius:6px">',
                 obj.image.url,
             )
         return '—'

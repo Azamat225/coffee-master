@@ -1,0 +1,49 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}Изображения{% endblock %}
+
+{% block content %}
+<h1 class="panel-h1">Изображения сайта</h1>
+
+<section class="panel-section">
+    <h2>Главная страница</h2>
+    <form method="post" enctype="multipart/form-data" class="panel-form">
+        {% csrf_token %}
+        <input type="hidden" name="site_key" value="hero">
+        <p><label>Файл <input type="file" name="image" accept="image/*"></label></p>
+        <p><label>Alt <input type="text" name="alt_text" value="{{ hero.alt_text|default:'' }}"></label></p>
+        {% if hero and hero.image %}<img src="{{ hero.image.url }}" alt="" class="panel-preview">{% endif %}
+        <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
+    </form>
+</section>
+
+<section class="panel-section">
+    <h2>О студии</h2>
+    <form method="post" enctype="multipart/form-data" class="panel-form">
+        {% csrf_token %}
+        <input type="hidden" name="site_key" value="about">
+        <p><label>Файл <input type="file" name="image" accept="image/*"></label></p>
+        <p><label>Alt <input type="text" name="alt_text" value="{{ about.alt_text|default:'' }}"></label></p>
+        {% if about and about.image %}<img src="{{ about.image.url }}" alt="" class="panel-preview">{% endif %}
+        <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
+    </form>
+</section>
+
+<section class="panel-section">
+    <h2>Коллаж «Наше пространство»</h2>
+    {% for photo in mosaic %}
+    <form method="post" enctype="multipart/form-data" class="panel-form panel-form--inline">
+        {% csrf_token %}
+        <input type="hidden" name="mosaic_slot" value="{{ photo.slot }}">
+        <p><strong>Ячейка {{ photo.slot }}</strong></p>
+        {% if photo.image %}<img src="{{ photo.image.url }}" alt="" class="panel-thumb panel-thumb--lg">{% endif %}
+        <p><label>Новый файл <input type="file" name="image" accept="image/*"></label></p>
+        <p><label>Подпись <input type="text" name="alt_text" value="{{ photo.alt_text }}"></label></p>
+        <p><label><input type="checkbox" name="is_active" {% if photo.is_active %}checked{% endif %}> Показывать</label></p>
+        <button type="submit" class="panel-btn">Обновить</button>
+    </form>
+    {% empty %}
+    <p class="panel-hint">Запустите <code>python manage.py load_site_images --force</code></p>
+    {% endfor %}
+</section>
+{% endblock %}

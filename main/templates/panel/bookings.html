@@ -1,0 +1,54 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}Записи{% endblock %}
+
+{% block content %}
+<div class="panel-head">
+    <h1 class="panel-h1">Записи гостей</h1>
+    {% if pending_count %}<span class="panel-badge">{{ pending_count }} новых</span>{% endif %}
+</div>
+
+<div class="panel-filters">
+    <a href="{% url 'panel_bookings' %}" class="panel-filter{% if not status_filter %} panel-filter--active{% endif %}">Все</a>
+    {% for value, label in status_choices %}
+    <a href="?status={{ value }}" class="panel-filter{% if status_filter == value %} panel-filter--active{% endif %}">{{ label }}</a>
+    {% endfor %}
+</div>
+
+<table class="panel-table">
+    <thead>
+        <tr>
+            <th>Имя</th>
+            <th>Телефон</th>
+            <th>Дата / время</th>
+            <th>Гостей</th>
+            <th>Статус</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for b in bookings %}
+        <tr>
+            <td><strong>{{ b.name }}</strong>{% if b.comment %}<br><span class="panel-muted">{{ b.comment|truncatechars:40 }}</span>{% endif %}</td>
+            <td><a href="tel:{{ b.phone }}">{{ b.phone }}</a></td>
+            <td>{{ b.date|date:"d.m.Y" }} {{ b.time|time:"H:i" }}</td>
+            <td>{{ b.guests }}</td>
+            <td><span class="panel-status panel-status--{{ b.status }}">{{ b.get_status_display }}</span></td>
+            <td>
+                <form method="post" class="panel-inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="booking_id" value="{{ b.pk }}">
+                    <select name="status" onchange="this.form.submit()">
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}"{% if b.status == value %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Записей пока нет.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

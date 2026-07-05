@@ -4,46 +4,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Green Studio{% endblock %}</title>
+    <title>{% block title %}{{ site_settings.site_name }}{% endblock %}</title>
+    <meta name="description" content="{{ seo_description }}">
+    <meta name="keywords" content="{{ seo_keywords }}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=36">
+    <script>
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    </script>
+    <style>
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            position: fixed !important;
+            inset: 0 !important;
+        }
+        #topbar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 36px !important;
+            z-index: 100002 !important;
+        }
+        #siteHeader {
+            position: fixed !important;
+            top: 36px !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 72px !important;
+            z-index: 100001 !important;
+        }
+        #siteScroll {
+            position: fixed !important;
+            top: 108px !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
 </head>
-<body>
-    <div class="grain" aria-hidden="true"></div>
+<body class="has-fixed-head">
+    <div class="topbar" id="topbar">
+        <p>{{ site_settings.topbar_text }}</p>
+    </div>
 
-    <header class="header header--over-hero" id="siteHeader">
-        <div class="header__bar">
-            <a href="{% url 'home' %}" class="logo">
-                <span class="logo__pulse"></span>
-                Green Studio
-            </a>
-            <div class="header__contacts">
-                <a href="tel:+79050006417" class="header__phone">+7 905 000 64 17</a>
-                <span class="header__address">ул. Артема 151</span>
-            </div>
+    <header class="header" id="siteHeader">
+        <div class="header__inner">
+            <nav class="header__nav header__nav--left">
+                <a href="#menu">Меню</a>
+                <a href="#promotions">Акции</a>
+                <a href="#about">О нас</a>
+            </nav>
+
+            <a href="{% url 'home' %}" class="header__logo">{{ site_settings.site_name }}</a>
+
+            <nav class="header__nav header__nav--right">
+                <a href="#gallery">Галерея</a>
+                <a href="#contacts">Контакты</a>
+                <a href="tel:{{ site_settings.phone_href }}" class="header__phone">{{ site_settings.phone }}</a>
+            </nav>
+
+            <button class="header__burger" id="menuToggle" aria-label="Меню" aria-expanded="false">
+                <span></span><span></span>
+            </button>
         </div>
     </header>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <div class="site-scroll" id="siteScroll">
+        <main class="main">
+            {% block content %}{% endblock %}
+        </main>
 
-    <footer class="footer">
-        <div class="footer__inner">
-            <span class="footer__name">Green Studio</span>
-            <div class="footer__row">
-                <a href="tel:+79050006417">+7 905 000 64 17</a>
-                <span class="footer__dot"></span>
-                <span>ул. Артема 151, этаж 2</span>
-                <span class="footer__dot"></span>
-                <span>Пн – Пт 9:00 – 21:00</span>
+        <footer class="footer" id="contacts">
+            <p class="footer__tagline">{{ site_settings.footer_tagline }}</p>
+            <div class="footer__grid">
+                <div class="footer__col">
+                    <h4 class="footer__heading">Навигация</h4>
+                    <ul class="footer__links">
+                        <li><a href="#menu">Меню</a></li>
+                        <li><a href="#promotions">Акции</a></li>
+                        <li><a href="#about">О нас</a></li>
+                        <li><a href="#gallery">Галерея</a></li>
+                        <li><a href="#contacts">Контакты</a></li>
+                    </ul>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__heading">Адрес</h4>
+                    <p class="footer__text">{{ site_settings.address_name }}</p>
+                    <p class="footer__text">{{ site_settings.address_street }}</p>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__heading">График</h4>
+                    <p class="footer__text">{{ site_settings.hours_weekday }}</p>
+                    <p class="footer__text">{{ site_settings.hours_weekend }}</p>
+                </div>
+                <div class="footer__col">
+                    <h4 class="footer__heading">Связь</h4>
+                    <ul class="footer__links">
+                        <li><a href="tel:{{ site_settings.phone_href }}">{{ site_settings.phone }}</a></li>
+                    </ul>
+                </div>
             </div>
-            <span class="footer__copy">&copy; 2026</span>
-        </div>
-    </footer>
+            <div class="footer__bottom">
+                <span>&copy; 2026 {{ site_settings.site_name }}</span>
+            </div>
+        </footer>
+    </div>
 
     {% block scripts %}{% endblock %}
+    <script src="{% static 'js/header.js' %}?v=5"></script>
 </body>
 </html>

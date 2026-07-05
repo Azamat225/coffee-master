@@ -1,0 +1,17 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<div class="panel-login">
+    <div class="panel-login__card">
+        <h1 class="panel-login__title">Панель управления</h1>
+        <p class="panel-login__sub">Green Studio</p>
+        <form method="post" class="panel-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="panel-btn panel-btn--primary">Войти</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

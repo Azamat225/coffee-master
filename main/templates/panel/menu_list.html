@@ -1,0 +1,59 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}Меню{% endblock %}
+
+{% block content %}
+<div class="panel-head">
+    <h1 class="panel-h1">Меню</h1>
+    <div class="panel-head__actions">
+        <a href="{% url 'panel_bulk_prices' %}" class="panel-btn">Массовые цены</a>
+        <a href="{% url 'panel_menu_add' %}" class="panel-btn panel-btn--primary">+ Добавить</a>
+    </div>
+</div>
+
+<table class="panel-table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Со скидкой</th>
+            <th>Быстро</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr class="{% if not item.is_available %}panel-row--dim{% endif %}">
+            <td>
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="" class="panel-thumb">
+                {% endif %}
+            </td>
+            <td><strong>{{ item.name }}</strong></td>
+            <td>{{ item.price|floatformat:0 }} ₽</td>
+            <td>
+                {% if item.has_discount %}
+                <span class="panel-sale">{{ item.get_effective_price|floatformat:0 }} ₽</span>
+                {% else %}—{% endif %}
+            </td>
+            <td class="panel-toggles">
+                <form method="post" action="{% url 'panel_menu_toggle' item.pk %}" class="panel-inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="field" value="is_available">
+                    <button type="submit" class="panel-toggle{% if item.is_available %} panel-toggle--on{% endif %}" title="В наличии">●</button>
+                </form>
+                <form method="post" action="{% url 'panel_menu_toggle' item.pk %}" class="panel-inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="field" value="is_popular">
+                    <button type="submit" class="panel-toggle panel-toggle--star{% if item.is_popular %} panel-toggle--on{% endif %}" title="Хит">★</button>
+                </form>
+            </td>
+            <td><a href="{% url 'panel_menu_edit' item.pk %}">Изменить</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Пока нет позиций.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

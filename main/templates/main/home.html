@@ -4,151 +4,192 @@
 {% block title %}Green Studio — ул. Артема 151{% endblock %}
 
 {% block content %}
-<section class="hero hero--has-image" id="hero">
-    <div class="hero__blobs" aria-hidden="true">
-        <span class="blob blob--1"></span>
-        <span class="blob blob--2"></span>
-        <span class="blob blob--3"></span>
-    </div>
+<section class="hero" id="hero">
+    <div class="hero__sticky">
+        <div class="hero__frame">
+            <div class="hero__bg">
+                <img
+                    src="{% if site_images.hero %}{{ site_images.hero.image.url }}{% else %}{% static 'images/gallery/hero.png' %}{% endif %}"
+                    alt="{% if site_images.hero %}{{ site_images.hero.alt_text|default:'Green Studio' }}{% else %}Green Studio — атмосфера студии{% endif %}"
+                    class="hero__image"
+                >
+                <div class="hero__overlay"></div>
+            </div>
 
-    <div class="hero__media">
-        <img
-            src="{% static 'images/gallery/hero.jpg' %}"
-            alt="Green Studio — интерьер студии"
-            class="hero__image"
-        >
-    </div>
-    <div class="hero__veil"></div>
-
-    <div class="hero__content">
-        <p class="hero__eyebrow">Студия · Кофе · Атмосфера</p>
-        <h1 class="hero__title">
-            Место, где<br>
-            <em class="hero__accent">всё продумано</em>
-        </h1>
-        <p class="hero__text">
-            Уютный интерьер, свежий кофе и тишина в самом сердце города.
-            Загляните — мы на Артема 151.
-        </p>
-    </div>
-
-    <div class="hero__scroll" aria-hidden="true">
-        <span class="hero__scroll-line"></span>
-    </div>
-</section>
-
-<section class="moods reveal">
-    <div class="moods__inner">
-        <span class="mood mood--green">Свежий кофе</span>
-        <span class="mood mood--pink">Нежный уют</span>
-        <span class="mood mood--gold">Тёплый свет</span>
-        <span class="mood mood--lime">Живая зелень</span>
-    </div>
-</section>
-
-{% if slides %}
-<section class="gallery gallery--full" aria-label="Галерея студии">
-    <div class="gallery__stage reveal">
-        <div class="gallery__intro">
-            <p class="gallery__label">Галерея</p>
-            <h2 class="gallery__title">Наше пространство</h2>
+            <div class="hero__body" id="heroContent">
+                <p class="hero__tag">{{ site_settings.hero_tagline }}</p>
+                <h1 class="hero__title">
+                    {{ site_settings.hero_title_line1 }}<br>
+                    {{ site_settings.hero_title_line2 }}
+                </h1>
+                <a href="#menu" class="hero__cta">Смотреть меню</a>
+            </div>
         </div>
+    </div>
+</section>
 
-        <div class="carousel" id="carousel" data-count="{{ slides|length }}">
-            <div class="carousel__viewport">
-                <div class="carousel__track" id="carouselTrack">
-                    {% for slide in slides %}
-                    <figure class="carousel__slide{% if forloop.first %} carousel__slide--active{% endif %}" data-index="{{ forloop.counter0 }}">
-                        <img
-                            src="{{ slide.image.url }}"
-                            alt="{{ slide.title|default:'Green Studio' }}"
-                            class="carousel__image"
-                            loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
-                        >
-                        {% if slide.title %}
-                        <figcaption class="carousel__caption">{{ slide.title }}</figcaption>
-                        {% endif %}
-                    </figure>
-                    {% endfor %}
-                </div>
-            </div>
+{% if promotions %}
+<section class="promo-section scroll-rise" id="promotions">
+    <div class="promo-section__head">
+        <p class="promo-section__tagline">На эту неделю</p>
+        <h2 class="promo-section__title">Акции</h2>
+        <span class="promo-section__line" aria-hidden="true"></span>
+    </div>
 
-            {% if slides|length > 1 %}
-            <div class="carousel__meta">
-                <span class="carousel__counter" id="carouselCounter">01 / {{ slides|length|stringformat:"02d" }}</span>
-            </div>
-
-            <button class="carousel__btn carousel__btn--prev" id="carouselPrev" aria-label="Предыдущее фото">
-                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                    <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-            <button class="carousel__btn carousel__btn--next" id="carouselNext" aria-label="Следующее фото">
-                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                    <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-
-            <div class="carousel__dots" id="carouselDots">
-                {% for slide in slides %}
-                <button
-                    class="carousel__dot{% if forloop.first %} carousel__dot--active{% endif %}"
-                    data-index="{{ forloop.counter0 }}"
-                    aria-label="Фото {{ forloop.counter }}"
-                ></button>
-                {% endfor %}
+    <div class="promo-list">
+        {% for promo in promotions %}
+        <article class="promo-item scroll-rise{% if forloop.counter|divisibleby:2 %} promo-item--reverse{% endif %}" style="--delay: {{ forloop.counter0 }}">
+            {% if promo.image %}
+            <div class="promo-item__visual">
+                <img src="{{ promo.image.url }}" alt="{{ promo.title }}">
             </div>
             {% endif %}
-        </div>
+            <div class="promo-item__content">
+                <h3 class="promo-item__title">{{ promo.title }}</h3>
+                {% if promo.discount_percent %}
+                <p class="promo-item__discount">−{{ promo.discount_percent|floatformat:0 }}% на выбранные позиции</p>
+                {% endif %}
+                {% if promo.text %}
+                <p class="promo-item__text">{{ promo.text }}</p>
+                {% endif %}
+                <a href="#menu" class="promo-item__link">В меню</a>
+            </div>
+        </article>
+        {% endfor %}
     </div>
 </section>
 {% endif %}
 
-<section class="about reveal">
-    <div class="about__inner">
-        <p class="about__label">Описание</p>
-        <h2 class="about__title">Green Studio</h2>
-        <div class="about__text">
+{% if menu_items %}
+<section class="section scroll-rise" id="menu">
+    <div class="section__head scroll-rise">
+        <h2 class="section__title">Меню</h2>
+    </div>
+
+    <div class="menu-grid">
+        {% for item in menu_items %}
+        <article class="menu-card scroll-rise{% if item.is_popular %} menu-card--popular{% endif %}{% if item.has_discount %} menu-card--sale{% endif %}" style="--delay: {{ forloop.counter0 }}">
+            <div class="menu-card__media">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.name }}" class="menu-card__img">
+                {% else %}
+                <div class="menu-card__placeholder"></div>
+                {% endif %}
+                {% if item.has_discount %}
+                <span class="menu-card__badge menu-card__badge--sale">{{ item.discount_label }}</span>
+                {% elif item.is_popular %}
+                <span class="menu-card__badge">Хит</span>
+                {% endif %}
+            </div>
+            <div class="menu-card__body">
+                <div class="menu-card__row">
+                    <h4 class="menu-card__name">{{ item.name }}</h4>
+                    <div class="menu-card__prices">
+                        {% if item.has_discount %}
+                        <span class="menu-card__price menu-card__price--old">{{ item.price|floatformat:0 }} ₽</span>
+                        <span class="menu-card__price menu-card__price--sale">{{ item.get_effective_price|floatformat:0 }} ₽</span>
+                        {% else %}
+                        <span class="menu-card__price">{{ item.price|floatformat:0 }} ₽</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if item.description %}
+                <p class="menu-card__desc">{{ item.description }}</p>
+                {% endif %}
+                {% if item.tags.exists %}
+                <div class="menu-card__tags">
+                    {% for tag in item.tags.all %}
+                    <span class="menu-card__tag">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="about-section scroll-rise" id="about">
+    <div class="about-section__bg" aria-hidden="true">
+        <img
+            src="{% if site_images.about %}{{ site_images.about.image.url }}{% else %}{% static 'images/gallery/hero.png' %}{% endif %}"
+            alt=""
+            class="about-section__image"
+        >
+        <div class="about-section__overlay"></div>
+    </div>
+    <div class="about-section__content">
+        <div class="section__head scroll-rise">
+            <h2 class="section__title section__title--on-image">О студии</h2>
+        </div>
+        <div class="prose prose--on-image scroll-rise">
             <p>
-                Green Studio — это пространство, где продуманный интерьер встречается
+                Green Studio — пространство, где продуманный интерьер встречается
                 с тёплой атмосферой и вниманием к деталям. Мягкий свет, живые растения,
-                бархатные кресла и аромат свежего кофе создают место, в котором
-                хочется задержаться.
+                бархатные кресла и аромат свежего кофе — место, в котором хочется задержаться.
             </p>
             <p>
-                Мы позаботились о каждой мелочи — от удобных зон отдыха до кофейной
-                станции с авторскими напитками. Загляните к нам на Артема 151
-                и почувствуйте это сами.
+                Мы позаботились о каждой мелочи: от удобных зон отдыха
+                до кофейной станции с авторскими напитками.
+                Загляните на Артема 151 и почувствуйте это сами.
             </p>
         </div>
     </div>
 </section>
 
-<section class="info reveal" id="contacts">
-    <div class="info__inner">
-        <p class="info__label">Контакты</p>
+<section class="gallery-wall scroll-rise" id="gallery">
+    <div class="gallery-wall__head scroll-rise">
+        <h2 class="section__title">Наше пространство</h2>
+    </div>
 
-        <div class="info__grid">
-            <div class="info__item">
-                <span class="info__item-label">Адрес</span>
-                <span class="info__item-value">ул. Артема 151, этаж 2</span>
+    <div class="gallery-mosaic">
+        {% if mosaic_photos %}
+            {% for photo in mosaic_photos %}
+            <figure class="gallery-mosaic__cell gallery-mosaic__cell--{{ photo.slot }}">
+                <img src="{{ photo.image.url }}" alt="{{ photo.alt_text|default:'Green Studio' }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+            </figure>
+            {% endfor %}
+        {% else %}
+            <figure class="gallery-mosaic__cell gallery-mosaic__cell--1"><img src="{% static 'images/gallery/collage/collage-03.png' %}" alt="Зал студии" loading="eager"></figure>
+            <figure class="gallery-mosaic__cell gallery-mosaic__cell--2"><img src="{% static 'images/gallery/collage/collage-01.png' %}" alt="Авторский напиток" loading="lazy"></figure>
+            <figure class="gallery-mosaic__cell gallery-mosaic__cell--3"><img src="{% static 'images/gallery/collage/collage-02.png' %}" alt="Кофе и десерты" loading="lazy"></figure>
+            <figure class="gallery-mosaic__cell gallery-mosaic__cell--4"><img src="{% static 'images/gallery/collage/collage-05.png' %}" alt="Интерьер" loading="lazy"></figure>
+            <figure class="gallery-mosaic__cell gallery-mosaic__cell--5"><img src="{% static 'images/gallery/collage/collage-04.png' %}" alt="Десерт и напиток" loading="lazy"></figure>
+        {% endif %}
+    </div>
+</section>
+
+<section class="studio-moment scroll-rise">
+    <div class="studio-moment__inner">
+        <p class="studio-moment__eyebrow">Между делами</p>
+        <h2 class="studio-moment__title">
+            Здесь не торопят.<br>
+            Здесь <span>остаются</span>.
+        </h2>
+        <p class="studio-moment__text">
+            Утренний эспрессо перед работой, тихий полдень с книгой
+            или вечерний латте с другом — Green Studio всегда на одном адресе.
+        </p>
+        <div class="studio-moment__facts">
+            <div class="studio-moment__fact">
+                <span class="studio-moment__fact-value">9:00</span>
+                <span class="studio-moment__fact-label">открываемся</span>
             </div>
-            <div class="info__item">
-                <span class="info__item-label">Телефон</span>
-                <a href="tel:+79050006417" class="info__item-value info__item-value--link">+7 905 000 64 17</a>
+            <div class="studio-moment__fact">
+                <span class="studio-moment__fact-value">1</span>
+                <span class="studio-moment__fact-label">этаж на Артема</span>
             </div>
-            <div class="info__item">
-                <span class="info__item-label">График работы</span>
-                <span class="info__item-value">Пн – Пт: 9:00 – 21:00</span>
-                <span class="info__item-value info__item-value--sub">Сб – Вс: 10:00 – 20:00</span>
+            <div class="studio-moment__fact">
+                <span class="studio-moment__fact-value">∞</span>
+                <span class="studio-moment__fact-label">минут тишины</span>
             </div>
         </div>
+        <a href="tel:+79050006417" class="studio-moment__link">+7 905 000 64 17</a>
     </div>
 </section>
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/header.js' %}"></script>
-<script src="{% static 'js/effects.js' %}"></script>
-<script src="{% static 'js/carousel.js' %}"></script>
+<script src="{% static 'js/scroll-effects.js' %}?v=3"></script>
 {% endblock %}

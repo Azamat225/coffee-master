@@ -1,0 +1,35 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}Акции{% endblock %}
+
+{% block content %}
+<div class="panel-head">
+    <h1 class="panel-h1">Акции</h1>
+    <a href="{% url 'panel_promotion_add' %}" class="panel-btn panel-btn--primary">+ Добавить</a>
+</div>
+
+<table class="panel-table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Скидка</th>
+            <th>Позиции</th>
+            <th>Активна</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for promo in promos %}
+        <tr>
+            <td><strong>{{ promo.title }}</strong></td>
+            <td>{{ promo.discount_percent|floatformat:0 }}%</td>
+            <td>{{ promo.menu_items.count }}</td>
+            <td>{% if promo.is_active %}Да{% else %}Нет{% endif %}</td>
+            <td><a href="{% url 'panel_promotion_edit' promo.pk %}">Изменить</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Нет акций.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

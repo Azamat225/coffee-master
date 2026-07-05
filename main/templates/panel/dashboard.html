@@ -1,0 +1,74 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<h1 class="panel-h1">Панель управления</h1>
+
+<div class="panel-cards">
+    <a href="{% url 'panel_menu_list' %}" class="panel-card">
+        <span class="panel-card__num">{{ menu_count }}</span>
+        <span class="panel-card__label">Позиций в меню</span>
+    </a>
+    <a href="{% url 'panel_promotions' %}" class="panel-card">
+        <span class="panel-card__num">{{ promo_count }}</span>
+        <span class="panel-card__label">Активных акций</span>
+    </a>
+    <a href="{% url 'panel_bookings' %}" class="panel-card{% if pending_bookings %} panel-card--alert{% endif %}">
+        <span class="panel-card__num">{{ pending_bookings }}</span>
+        <span class="panel-card__label">Новых записей</span>
+    </a>
+    <a href="{% url 'panel_menu_list' %}" class="panel-card">
+        <span class="panel-card__num">{% if avg_price %}{{ avg_price|floatformat:0 }}{% else %}—{% endif %}</span>
+        <span class="panel-card__label">Средняя цена, ₽</span>
+    </a>
+</div>
+
+<div class="panel-quick">
+    <a href="{% url 'panel_settings' %}" class="panel-quick__btn">Настройки сайта</a>
+    <a href="{% url 'panel_bulk_prices' %}" class="panel-quick__btn">Массовое изменение цен</a>
+    <a href="{% url 'panel_menu_add' %}" class="panel-quick__btn panel-quick__btn--accent">+ Позиция</a>
+</div>
+
+{% if on_sale %}
+<section class="panel-block">
+    <h2 class="panel-block__title">Сейчас со скидкой</h2>
+    <ul class="panel-list">
+        {% for item in on_sale %}
+        <li>
+            <span>{{ item.name }}</span>
+            <span class="panel-sale">{{ item.get_effective_price|floatformat:0 }} ₽</span>
+            <span class="panel-muted"><s>{{ item.price|floatformat:0 }} ₽</s></span>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+{% if unavailable_count %}
+<p class="panel-hint panel-hint--warn">⚠ {{ unavailable_count }} позиций скрыто с сайта (нет в наличии).</p>
+{% endif %}
+
+{% if recent_bookings %}
+<section class="panel-block">
+    <div class="panel-head">
+        <h2 class="panel-block__title">Последние записи</h2>
+        <a href="{% url 'panel_bookings' %}">Все →</a>
+    </div>
+    <table class="panel-table panel-table--compact">
+        <thead>
+            <tr><th>Имя</th><th>Дата</th><th>Статус</th></tr>
+        </thead>
+        <tbody>
+            {% for b in recent_bookings %}
+            <tr>
+                <td>{{ b.name }}</td>
+                <td>{{ b.date|date:"d.m" }} {{ b.time|time:"H:i" }}</td>
+                <td><span class="panel-status panel-status--{{ b.status }}">{{ b.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endif %}
+{% endblock %}
