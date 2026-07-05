@@ -1,3 +1,5 @@
+from django.conf import settings as django_settings
+
 from .models import MenuTag, SiteSettings
 
 
@@ -38,4 +40,5 @@ def site_settings(request):
             f'{settings.site_name} — кофе, десерты и уютная атмосфера. '
             f'{settings.address_street}. Тел. {settings.phone}.'
         ),
+        'api_base_url': django_settings.API_BASE_URL,
     }

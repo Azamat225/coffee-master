@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -14,9 +15,19 @@ app = FastAPI(
     version='1.0.0',
 )
 
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        'API_CORS_ORIGINS',
+        'http://127.0.0.1:8135,http://localhost:8135,'
+        'https://green-cafe-str.ru,https://www.green-cafe-str.ru',
+    ).split(',')
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://127.0.0.1:8135', 'http://localhost:8135'],
+    allow_origins=CORS_ORIGINS,
     allow_methods=['*'],
     allow_headers=['*'],
 )
