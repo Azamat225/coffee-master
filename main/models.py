@@ -157,8 +157,23 @@ class Booking(models.Model):
 
 
 class GallerySlide(models.Model):
+    ASPECT_RATIO_CHOICES = [
+        ('auto', 'Авто'),
+        ('1:1', '1:1'),
+        ('4:3', '4:3'),
+        ('16:9', '16:9'),
+        ('3:4', '3:4'),
+    ]
+
     title = models.CharField('Подпись', max_length=200, blank=True)
     image = models.ImageField('Фото', upload_to='gallery/')
+    aspect_ratio = models.CharField(
+        'Формат',
+        max_length=10,
+        choices=ASPECT_RATIO_CHOICES,
+        default='auto',
+        help_text='Авто — показывать в исходных пропорциях.',
+    )
     order = models.PositiveIntegerField('Порядок', default=0)
     is_active = models.BooleanField('Показывать', default=True)
     created_at = models.DateTimeField('Загружено', auto_now_add=True)
@@ -222,6 +237,8 @@ class SiteImage(models.Model):
 
 
 class MosaicPhoto(models.Model):
+    ASPECT_RATIO_CHOICES = GallerySlide.ASPECT_RATIO_CHOICES
+
     SLOT_CHOICES = [
         (1, '1 — большая слева'),
         (2, '2 — широкая справа сверху'),
@@ -232,6 +249,13 @@ class MosaicPhoto(models.Model):
 
     slot = models.PositiveSmallIntegerField('Ячейка', choices=SLOT_CHOICES, unique=True)
     image = models.ImageField('Фото', upload_to='mosaic/')
+    aspect_ratio = models.CharField(
+        'Формат',
+        max_length=10,
+        choices=ASPECT_RATIO_CHOICES,
+        default='auto',
+        help_text='Авто — показывать в исходных пропорциях.',
+    )
     alt_text = models.CharField('Подпись', max_length=200, blank=True)
     is_active = models.BooleanField('Показывать', default=True)
     updated_at = models.DateTimeField('Обновлено', auto_now=True)

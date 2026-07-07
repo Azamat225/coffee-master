@@ -1,50 +1,53 @@
 {% extends 'main/base.html' %}
-{% load static %}
+{% load static gallery_tags %}
 
 {% block title %}Галерея — {{ site_settings.site_name }}{% endblock %}
 
 {% block content %}
 <section class="subpage-hero scroll-rise">
-    <p class="subpage-hero__eyebrow">Green Studio</p>
+    <p class="subpage-hero__eyebrow">Атмосфера</p>
     <h1 class="subpage-hero__title">Наше пространство</h1>
-    <p class="subpage-hero__desc">Интерьер, свет, детали и атмосфера, ради которых сюда возвращаются.</p>
+    <p class="subpage-hero__desc">Фото в естественных пропорциях — горизонтальные, квадратные и вертикальные кадры смотрятся так, как задумано.</p>
 </section>
 
-<section class="gallery-wall scroll-rise">
-    <div class="gallery-mosaic">
-        {% if mosaic_photos %}
-            {% for photo in mosaic_photos %}
-            <figure class="gallery-mosaic__cell gallery-mosaic__cell--{{ photo.slot }}">
-                <img src="{{ photo.image.url }}" alt="{{ photo.alt_text|default:'Green Studio' }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
-            </figure>
-            {% endfor %}
-        {% else %}
-            <figure class="gallery-mosaic__cell gallery-mosaic__cell--1"><img src="{% static 'images/gallery/collage/collage-03.png' %}" alt="Зал студии" loading="eager"></figure>
-            <figure class="gallery-mosaic__cell gallery-mosaic__cell--2"><img src="{% static 'images/gallery/collage/collage-01.png' %}" alt="Авторский напиток" loading="lazy"></figure>
-            <figure class="gallery-mosaic__cell gallery-mosaic__cell--3"><img src="{% static 'images/gallery/collage/collage-02.png' %}" alt="Кофе и десерты" loading="lazy"></figure>
-            <figure class="gallery-mosaic__cell gallery-mosaic__cell--4"><img src="{% static 'images/gallery/collage/collage-05.png' %}" alt="Интерьер" loading="lazy"></figure>
-            <figure class="gallery-mosaic__cell gallery-mosaic__cell--5"><img src="{% static 'images/gallery/collage/collage-04.png' %}" alt="Десерт и напиток" loading="lazy"></figure>
-        {% endif %}
-    </div>
-</section>
-
-{% if slides %}
-<section class="section scroll-rise">
-    <div class="section__head scroll-rise">
-        <h2 class="section__title">Ещё фото</h2>
-    </div>
-    <div class="gallery-extra">
-        {% for slide in slides %}
-        <figure class="gallery-extra__item scroll-rise" style="--delay: {{ forloop.counter0 }}">
-            <img src="{{ slide.image.url }}" alt="{{ slide.title|default:'Green Studio' }}" loading="lazy">
-            {% if slide.title %}<figcaption>{{ slide.title }}</figcaption>{% endif %}
+<section class="gallery-section scroll-rise">
+    {% if gallery_items %}
+    <div class="gallery-masonry" id="galleryMasonry">
+        {% for item in gallery_items %}
+        <figure class="gallery-item {{ item.aspect_ratio|aspect_class }} scroll-rise" style="--delay: {{ forloop.counter0 }}">
+            <button type="button" class="gallery-item__open" data-full="{{ item.image.url }}" aria-label="Открыть фото">
+                <img
+                    src="{{ item.image.url }}"
+                    alt="{{ item.title|default:'Green Studio' }}"
+                    loading="{% if forloop.counter <= 3 %}eager{% else %}lazy{% endif %}"
+                >
+            </button>
+            {% if item.title %}
+            <figcaption class="gallery-item__caption">{{ item.title }}</figcaption>
+            {% endif %}
         </figure>
         {% endfor %}
     </div>
+    {% else %}
+    <div class="gallery-fallback">
+        <div class="gallery-masonry">
+            <figure class="gallery-item gallery-item--16-9"><img src="{% static 'images/gallery/collage/collage-03.png' %}" alt="Зал студии"></figure>
+            <figure class="gallery-item gallery-item--1-1"><img src="{% static 'images/gallery/collage/collage-01.png' %}" alt="Напиток"></figure>
+            <figure class="gallery-item gallery-item--4-3"><img src="{% static 'images/gallery/collage/collage-02.png' %}" alt="Кофе"></figure>
+            <figure class="gallery-item gallery-item--16-9"><img src="{% static 'images/gallery/collage/collage-05.png' %}" alt="Интерьер"></figure>
+            <figure class="gallery-item gallery-item--3-4"><img src="{% static 'images/gallery/collage/collage-04.png' %}" alt="Десерт"></figure>
+        </div>
+    </div>
+    {% endif %}
 </section>
-{% endif %}
+
+<div class="lightbox" id="galleryLightbox" hidden>
+    <button type="button" class="lightbox__close" id="lightboxClose" aria-label="Закрыть">×</button>
+    <img src="" alt="" class="lightbox__img" id="lightboxImg">
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{% static 'js/scroll-effects.js' %}?v=3"></script>
+<script src="{% static 'js/gallery.js' %}?v=1"></script>
 {% endblock %}

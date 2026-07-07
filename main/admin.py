@@ -40,7 +40,7 @@ class MosaicPhotoAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
     ordering = ('slot',)
     readonly_fields = ('image_preview_large', 'updated_at')
-    fields = ('slot', 'image', 'image_preview_large', 'alt_text', 'is_active', 'updated_at')
+    fields = ('slot', 'image', 'image_preview_large', 'aspect_ratio', 'alt_text', 'is_active', 'updated_at')
 
     @admin.display(description='Превью')
     def image_preview(self, obj):
@@ -97,7 +97,7 @@ class GallerySlideAdmin(admin.ModelAdmin):
     ordering = ('order', '-created_at')
     fieldsets = (
         (None, {
-            'fields': ('image', 'title', 'order', 'is_active'),
+            'fields': ('image', 'title', 'aspect_ratio', 'order', 'is_active'),
         }),
     )
 

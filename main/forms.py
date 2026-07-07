@@ -97,4 +97,4 @@ class SiteImageForm(forms.ModelForm):
 class MosaicPhotoForm(forms.ModelForm):
     class Meta:
         model = MosaicPhoto
-        fields = ['image', 'alt_text', 'is_active']
+        fields = ['image', 'alt_text', 'aspect_ratio', 'is_active']

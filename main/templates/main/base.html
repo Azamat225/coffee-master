@@ -1,6 +1,6 @@
-{% load static %}
+{% load static gallery_tags %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,50 +8,21 @@
     <meta name="description" content="{{ seo_description }}">
     <meta name="keywords" content="{{ seo_keywords }}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=37">
     <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('gs-theme') || 'light';
+                document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     </script>
-    <style>
-        html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            overflow: hidden !important;
-            position: fixed !important;
-            inset: 0 !important;
-        }
-        #topbar {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            height: 36px !important;
-            z-index: 100002 !important;
-        }
-        #siteHeader {
-            position: fixed !important;
-            top: 36px !important;
-            left: 0 !important;
-            right: 0 !important;
-            height: 72px !important;
-            z-index: 100001 !important;
-        }
-        #siteScroll {
-            position: fixed !important;
-            top: 108px !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            overflow-x: hidden !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch;
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=38">
 </head>
 <body class="has-fixed-head">
     <div class="topbar" id="topbar">
@@ -66,11 +37,17 @@
                 <a href="{% url 'promotions' %}" class="{% if request.resolver_match.url_name == 'promotions' %}header__link--active{% endif %}">Акции</a>
             </nav>
 
-            <a href="{% url 'home' %}" class="header__logo">{{ site_settings.site_name }}</a>
+            <a href="{% url 'home' %}" class="header__logo">
+                <span class="header__logo-mark">☕</span>
+                <span>{{ site_settings.site_name }}</span>
+            </a>
 
             <nav class="header__nav header__nav--right">
                 <a href="{% url 'gallery' %}" class="{% if request.resolver_match.url_name == 'gallery' %}header__link--active{% endif %}">Галерея</a>
                 <a href="{% url 'contacts' %}" class="{% if request.resolver_match.url_name == 'contacts' %}header__link--active{% endif %}">Контакты</a>
+                <button type="button" class="theme-toggle" data-theme-toggle aria-label="Тёмная тема" aria-pressed="false">
+                    <span class="theme-toggle__icon" aria-hidden="true">☾</span>
+                </button>
                 <a href="tel:{{ site_settings.phone_href }}" class="header__phone">{{ site_settings.phone }}</a>
             </nav>
 
@@ -86,7 +63,16 @@
         </main>
 
         <footer class="footer">
-            <p class="footer__tagline">{{ site_settings.footer_tagline }}</p>
+            <div class="footer__top">
+                <div class="footer__brand">
+                    <p class="footer__name">{{ site_settings.site_name }}</p>
+                    <p class="footer__tagline">{{ site_settings.footer_tagline }}</p>
+                </div>
+                <button type="button" class="theme-toggle theme-toggle--footer" data-theme-toggle aria-label="Тёмная тема" aria-pressed="false">
+                    <span class="theme-toggle__icon" aria-hidden="true">☾</span>
+                    <span class="theme-toggle__label">Тема</span>
+                </button>
+            </div>
             <div class="footer__grid">
                 <div class="footer__col">
                     <h4 class="footer__heading">Навигация</h4>
@@ -122,6 +108,7 @@
     </div>
 
     {% block scripts %}{% endblock %}
-    <script src="{% static 'js/header.js' %}?v=5"></script>
+    <script src="{% static 'js/theme.js' %}?v=1"></script>
+    <script src="{% static 'js/header.js' %}?v=6"></script>
 </body>
 </html>

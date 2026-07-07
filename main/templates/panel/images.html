@@ -38,8 +38,16 @@
         <p><strong>Ячейка {{ photo.slot }}</strong></p>
         {% if photo.image %}<img src="{{ photo.image.url }}" alt="" class="panel-thumb panel-thumb--lg">{% endif %}
         <p><label>Новый файл <input type="file" name="image" accept="image/*"></label></p>
-        <p><label>Подпись <input type="text" name="alt_text" value="{{ photo.alt_text }}"></label></p>
-        <p><label><input type="checkbox" name="is_active" {% if photo.is_active %}checked{% endif %}> Показывать</label></p>
+        <p><label>Подпись <input type="text" name="alt_text" value="{{ photo.alt_text|default:'' }}"></label></p>
+        <p><label>Формат
+            <select name="aspect_ratio">
+                <option value="auto"{% if photo.aspect_ratio|default:'auto' == 'auto' %} selected{% endif %}>Авто</option>
+                <option value="1:1"{% if photo.aspect_ratio == '1:1' %} selected{% endif %}>1:1</option>
+                <option value="4:3"{% if photo.aspect_ratio == '4:3' %} selected{% endif %}>4:3</option>
+                <option value="16:9"{% if photo.aspect_ratio == '16:9' %} selected{% endif %}>16:9</option>
+                <option value="3:4"{% if photo.aspect_ratio == '3:4' %} selected{% endif %}>3:4</option>
+            </select>
+        </label></p>        <p><label><input type="checkbox" name="is_active" {% if photo.is_active %}checked{% endif %}> Показывать</label></p>
         <button type="submit" class="panel-btn">Обновить</button>
     </form>
     {% empty %}
