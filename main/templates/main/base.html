@@ -11,10 +11,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=36">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=37">
     <script>
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-        if (location.hash) history.replaceState(null, '', location.pathname + location.search);
     </script>
     <style>
         html, body {
@@ -62,16 +61,16 @@
     <header class="header" id="siteHeader">
         <div class="header__inner">
             <nav class="header__nav header__nav--left">
-                <a href="#menu">Меню</a>
-                <a href="#promotions">Акции</a>
-                <a href="#about">О нас</a>
+                <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}header__link--active{% endif %}">Главная</a>
+                <a href="{% url 'menu' %}" class="{% if request.resolver_match.url_name == 'menu' %}header__link--active{% endif %}">Меню</a>
+                <a href="{% url 'promotions' %}" class="{% if request.resolver_match.url_name == 'promotions' %}header__link--active{% endif %}">Акции</a>
             </nav>
 
             <a href="{% url 'home' %}" class="header__logo">{{ site_settings.site_name }}</a>
 
             <nav class="header__nav header__nav--right">
-                <a href="#gallery">Галерея</a>
-                <a href="#contacts">Контакты</a>
+                <a href="{% url 'gallery' %}" class="{% if request.resolver_match.url_name == 'gallery' %}header__link--active{% endif %}">Галерея</a>
+                <a href="{% url 'contacts' %}" class="{% if request.resolver_match.url_name == 'contacts' %}header__link--active{% endif %}">Контакты</a>
                 <a href="tel:{{ site_settings.phone_href }}" class="header__phone">{{ site_settings.phone }}</a>
             </nav>
 
@@ -86,17 +85,17 @@
             {% block content %}{% endblock %}
         </main>
 
-        <footer class="footer" id="contacts">
+        <footer class="footer">
             <p class="footer__tagline">{{ site_settings.footer_tagline }}</p>
             <div class="footer__grid">
                 <div class="footer__col">
                     <h4 class="footer__heading">Навигация</h4>
                     <ul class="footer__links">
-                        <li><a href="#menu">Меню</a></li>
-                        <li><a href="#promotions">Акции</a></li>
-                        <li><a href="#about">О нас</a></li>
-                        <li><a href="#gallery">Галерея</a></li>
-                        <li><a href="#contacts">Контакты</a></li>
+                        <li><a href="{% url 'home' %}">Главная</a></li>
+                        <li><a href="{% url 'menu' %}">Меню</a></li>
+                        <li><a href="{% url 'promotions' %}">Акции</a></li>
+                        <li><a href="{% url 'gallery' %}">Галерея</a></li>
+                        <li><a href="{% url 'contacts' %}">Контакты</a></li>
                     </ul>
                 </div>
                 <div class="footer__col">

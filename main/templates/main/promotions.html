@@ -1,0 +1,50 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Акции — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="subpage-hero scroll-rise">
+    <p class="subpage-hero__eyebrow">На эту неделю</p>
+    <h1 class="subpage-hero__title">Акции</h1>
+    <p class="subpage-hero__desc">Специальные предложения и скидки на выбранные позиции меню.</p>
+</section>
+
+{% if promotions %}
+<section class="promo-section scroll-rise">
+    <div class="promo-list">
+        {% for promo in promotions %}
+        <article class="promo-item scroll-rise{% if forloop.counter|divisibleby:2 %} promo-item--reverse{% endif %}" style="--delay: {{ forloop.counter0 }}">
+            {% if promo.image %}
+            <div class="promo-item__visual">
+                <img src="{{ promo.image.url }}" alt="{{ promo.title }}">
+            </div>
+            {% else %}
+            <div class="promo-item__visual promo-item__visual--placeholder">
+                <span>−{{ promo.discount_percent|floatformat:0 }}%</span>
+            </div>
+            {% endif %}
+            <div class="promo-item__content">
+                <h3 class="promo-item__title">{{ promo.title }}</h3>
+                {% if promo.discount_percent %}
+                <p class="promo-item__discount">−{{ promo.discount_percent|floatformat:0 }}% на выбранные позиции</p>
+                {% endif %}
+                {% if promo.text %}
+                <p class="promo-item__text">{{ promo.text }}</p>
+                {% endif %}
+                <a href="{% url 'menu' %}" class="promo-item__link">Смотреть меню</a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% else %}
+<section class="section">
+    <p class="empty-page">Сейчас нет активных акций. Следите за обновлениями!</p>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/scroll-effects.js' %}?v=3"></script>
+{% endblock %}

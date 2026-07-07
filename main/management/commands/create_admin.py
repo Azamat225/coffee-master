@@ -1,15 +1,27 @@
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
 User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = 'Создаёт суперпользователя admin/admin'
+    help = 'Создаёт или обновляет суперпользователя admin / admin123'
 
     def handle(self, *args, **options):
-        if User.objects.filter(username='admin').exists():
-            self.stdout.write('Суперпользователь admin уже существует.')
-            return
-        User.objects.create_superuser('admin', 'admin@aromacoffee.ru', 'admin')
-        self.stdout.write(self.style.SUCCESS('Создан admin / admin'))
+        user, created = User.objects.get_or_create(
+            username='admin',
+            defaults={
+                'email': 'admin@green-cafe-str.ru',
+                'is_staff': True,
+                'is_superuser': True,
+            },
+        )
+        user.set_password('admin123')
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+
+        if created:
+            self.stdout.write(self.style.SUCCESS('Создан admin / admin123'))
+        else:
+            self.stdout.write(self.style.SUCCESS('Пароль admin обновлён на admin123'))

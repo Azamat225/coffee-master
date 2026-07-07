@@ -1,0 +1,44 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Контакты — {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="subpage-hero scroll-rise">
+    <p class="subpage-hero__eyebrow">Ждём вас</p>
+    <h1 class="subpage-hero__title">Контакты</h1>
+    <p class="subpage-hero__desc">Приходите на кофе, работайте в тишине или просто заходите поздороваться.</p>
+</section>
+
+<section class="section contacts-page scroll-rise">
+    <div class="contacts-grid">
+        <article class="contacts-card">
+            <span class="contacts-card__icon">📍</span>
+            <h2>Адрес</h2>
+            <p class="contacts-card__main">{{ site_settings.address_name }}</p>
+            <p>{{ site_settings.address_street }}</p>
+        </article>
+
+        <article class="contacts-card">
+            <span class="contacts-card__icon">🕐</span>
+            <h2>График</h2>
+            <p>{{ site_settings.hours_weekday }}</p>
+            <p>{{ site_settings.hours_weekend }}</p>
+        </article>
+
+        <article class="contacts-card contacts-card--accent">
+            <span class="contacts-card__icon">📞</span>
+            <h2>Телефон</h2>
+            <a href="tel:{{ site_settings.phone_href }}" class="contacts-card__phone">{{ site_settings.phone }}</a>
+            <p class="contacts-card__hint">Позвоните — подскажем по меню и брони</p>
+        </article>
+    </div>
+
+    <div class="contacts-banner scroll-rise">
+        <p class="contacts-banner__tagline">{{ site_settings.footer_tagline }}</p>
+        <div class="contacts-banner__actions">
+            <a href="tel:{{ site_settings.phone_href }}" class="hero__cta">Позвонить</a>
+            <a href="{% url 'menu' %}" class="contacts-banner__link">Смотреть меню</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
