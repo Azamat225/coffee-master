@@ -1,5 +1,5 @@
 {% extends 'main/base.html' %}
-{% load static gallery_tags %}
+{% load static %}
 
 {% block title %}Галерея — {{ site_settings.site_name }}{% endblock %}
 
@@ -14,7 +14,7 @@
     {% if gallery_items %}
     <div class="gallery-masonry" id="galleryMasonry">
         {% for item in gallery_items %}
-        <figure class="gallery-item {{ item.aspect_ratio|aspect_class }} scroll-rise" style="--delay: {{ forloop.counter0 }}">
+        <figure class="gallery-item {{ item.aspect_class }} scroll-rise" style="--delay: {{ forloop.counter0 }}">
             <button type="button" class="gallery-item__open" data-full="{{ item.image.url }}" aria-label="Открыть фото">
                 <img
                     src="{{ item.image.url }}"

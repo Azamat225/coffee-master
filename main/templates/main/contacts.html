@@ -1,4 +1,5 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
 {% block title %}Контакты — {{ site_settings.site_name }}{% endblock %}
 
@@ -44,6 +45,5 @@
 {% endblock %}
 
 {% block scripts %}
-{% load static %}
 <script src="{% static 'js/scroll-effects.js' %}?v=3"></script>
 {% endblock %}

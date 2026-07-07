@@ -19,20 +19,28 @@ def _site_images():
     return {img.key: img for img in SiteImage.objects.all()}
 
 
+def _aspect_class(ratio):
+    if not ratio or ratio == 'auto':
+        return ''
+    return f'gallery-item--{ratio.replace(":", "-")}'
+
+
 def _build_gallery_items():
     items = []
     for photo in MosaicPhoto.objects.filter(is_active=True).order_by('slot'):
+        ratio = getattr(photo, 'aspect_ratio', 'auto')
         items.append({
             'image': photo.image,
             'title': photo.alt_text,
-            'aspect_ratio': photo.aspect_ratio,
+            'aspect_class': _aspect_class(ratio),
             'sort': photo.slot,
         })
     for slide in GallerySlide.objects.filter(is_active=True).order_by('order', '-created_at'):
+        ratio = getattr(slide, 'aspect_ratio', 'auto')
         items.append({
             'image': slide.image,
             'title': slide.title,
-            'aspect_ratio': slide.aspect_ratio,
+            'aspect_class': _aspect_class(ratio),
             'sort': 100 + slide.order,
         })
     items.sort(key=lambda item: item['sort'])

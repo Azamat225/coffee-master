@@ -10,16 +10,13 @@
         }
     }
 
-    function applyTheme(theme) {
-        const next = theme === 'dark' ? 'dark' : 'light';
-        root.setAttribute('data-theme', next);
-        try {
-            localStorage.setItem(STORAGE_KEY, next);
-        } catch {
-            /* ignore */
-        }
+    function getTheme() {
+        return root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    }
+
+    function updateToggleButtons(theme) {
+        const isDark = theme === 'dark';
         document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
-            const isDark = next === 'dark';
             btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             btn.setAttribute('aria-label', isDark ? 'Светлая тема' : 'Тёмная тема');
             const icon = btn.querySelector('.theme-toggle__icon');
@@ -29,17 +26,29 @@
         });
     }
 
+    function applyTheme(theme) {
+        const next = theme === 'dark' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try {
+            localStorage.setItem(STORAGE_KEY, next);
+        } catch {
+            /* ignore */
+        }
+        updateToggleButtons(next);
+    }
+
     window.GSTheme = {
-        get: function () {
-            return root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-        },
+        get: getTheme,
         set: applyTheme,
         toggle: function () {
-            applyTheme(this.get() === 'dark' ? 'light' : 'dark');
+            applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
         },
     };
 
+    updateToggleButtons(getTheme());
+
     document.addEventListener('DOMContentLoaded', function () {
+        updateToggleButtons(getTheme());
         document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 window.GSTheme.toggle();
