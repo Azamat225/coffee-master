@@ -58,19 +58,12 @@
 {% endif %}
 
 <section class="about-section scroll-rise" id="about">
-    <div class="about-section__bg" aria-hidden="true">
-        <img
-            src="{% if site_images.about %}{{ site_images.about.image.url }}{% else %}{% static 'images/gallery/hero.png' %}{% endif %}"
-            alt=""
-            class="about-section__image"
-        >
-        <div class="about-section__overlay"></div>
-    </div>
     <div class="about-section__content">
         <div class="section__head scroll-rise">
-            <h2 class="section__title section__title--on-image">О студии</h2>
+            <p class="section__label">Green Studio</p>
+            <h2 class="section__title">О студии</h2>
         </div>
-        <div class="prose prose--on-image scroll-rise">
+        <div class="prose scroll-rise">
             <p>
                 Green Studio — пространство, где продуманный интерьер встречается
                 с тёплой атмосферой и вниманием к деталям. Мягкий свет, живые растения,
