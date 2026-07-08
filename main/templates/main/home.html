@@ -28,6 +28,35 @@
     </div>
 </section>
 
+{% if popular_items %}
+<section class="section scroll-rise" id="popular">
+    <div class="section__head scroll-rise">
+        <p class="section__label">Популярное</p>
+        <h2 class="section__title">Хиты меню</h2>
+    </div>
+    <div class="menu-grid menu-grid--compact">
+        {% for item in popular_items %}
+        <article class="menu-card scroll-rise menu-card--popular" style="--delay: {{ forloop.counter0 }}">
+            <div class="menu-card__media">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.name }}" class="menu-card__img">
+                {% else %}
+                <div class="menu-card__placeholder"></div>
+                {% endif %}
+                <span class="menu-card__badge">Хит</span>
+            </div>
+            <div class="menu-card__body">
+                <div class="menu-card__row">
+                    <h4 class="menu-card__name">{{ item.name }}</h4>
+                    <span class="menu-card__price">{{ item.get_effective_price|floatformat:0 }} ₽</span>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
 <section class="about-section scroll-rise" id="about">
     <div class="about-section__bg" aria-hidden="true">
         <img
@@ -54,61 +83,6 @@
             </p>
         </div>
     </div>
-</section>
-
-{% if popular_items %}
-<section class="section scroll-rise">
-    <div class="section__head scroll-rise">
-        <p class="section__label">Популярное</p>
-        <h2 class="section__title">Хиты меню</h2>
-    </div>
-    <div class="menu-grid menu-grid--compact">
-        {% for item in popular_items %}
-        <article class="menu-card scroll-rise menu-card--popular" style="--delay: {{ forloop.counter0 }}">
-            <div class="menu-card__media">
-                {% if item.image %}
-                <img src="{{ item.image.url }}" alt="{{ item.name }}" class="menu-card__img">
-                {% else %}
-                <div class="menu-card__placeholder"></div>
-                {% endif %}
-                <span class="menu-card__badge">Хит</span>
-            </div>
-            <div class="menu-card__body">
-                <div class="menu-card__row">
-                    <h4 class="menu-card__name">{{ item.name }}</h4>
-                    <span class="menu-card__price">{{ item.get_effective_price|floatformat:0 }} ₽</span>
-                </div>
-            </div>
-        </article>
-        {% endfor %}
-    </div>
-    <p class="section__cta-wrap">
-        <a href="{% url 'menu' %}" class="section__cta">Всё меню →</a>
-    </p>
-</section>
-{% endif %}
-
-<section class="page-nav-cards scroll-rise">
-    <a href="{% url 'menu' %}" class="page-nav-card">
-        <span class="page-nav-card__label">Раздел</span>
-        <span class="page-nav-card__title">Меню</span>
-        <span class="page-nav-card__desc">Напитки, десерты и авторские позиции</span>
-    </a>
-    <a href="{% url 'promotions' %}" class="page-nav-card">
-        <span class="page-nav-card__label">Раздел</span>
-        <span class="page-nav-card__title">Акции</span>
-        <span class="page-nav-card__desc">Спецпредложения этой недели</span>
-    </a>
-    <a href="{% url 'gallery' %}" class="page-nav-card">
-        <span class="page-nav-card__label">Раздел</span>
-        <span class="page-nav-card__title">Галерея</span>
-        <span class="page-nav-card__desc">Интерьер и атмосфера студии</span>
-    </a>
-    <a href="{% url 'contacts' %}" class="page-nav-card">
-        <span class="page-nav-card__label">Раздел</span>
-        <span class="page-nav-card__title">Контакты</span>
-        <span class="page-nav-card__desc">Адрес, график и телефон</span>
-    </a>
 </section>
 
 <section class="studio-moment scroll-rise">
