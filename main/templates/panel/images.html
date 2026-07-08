@@ -30,63 +30,181 @@
 </section>
 
 <section class="panel-section">
-    <h2>Галерея на сайте</h2>
+    <h2>Коллаж «Наше пространство»</h2>
     <p class="panel-hint">
-        Добавляйте сколько угодно фото — они автоматически выстраиваются в галерее.
-        Можно загружать горизонтальные, вертикальные и квадратные кадры.
+        Эти фото дают основу для раскладки. Можно менять <b>формат</b>, <b>подпись</b> и <b>Показывать</b> (Да/Нет).
+        Фото удалять не нужно.
+    </p>
+
+    {% if mosaic_photos %}
+        <div class="panel-gallery-cards">
+            {% for photo in mosaic_photos %}
+                <div class="panel-gallery-card">
+                    {% if photo.image %}
+                        <img src="{{ photo.image.url }}" alt="" class="panel-gallery-card__img">
+                    {% endif %}
+
+                    <div class="panel-gallery-card__title">
+                        <div class="panel-hint">Ячейка {{ photo.slot }}</div>
+                        <div class="panel-gallery-card__slot">
+                            {% if photo.is_active %}Показывать: Да{% else %}Показывать: Нет{% endif %}
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" class="panel-form panel-gallery-card__form">
+                        {% csrf_token %}
+                        <input type="hidden" name="mosaic_action" value="update">
+                        <input type="hidden" name="mosaic_slot" value="{{ photo.slot }}">
+
+                        <div class="panel-form__grid">
+                            <div class="panel-form__row">
+                                <label>Подпись
+                                    <input type="text" name="alt_text" value="{{ photo.alt_text|default:'' }}" placeholder="Например: Барная зона">
+                                </label>
+                            </div>
+
+                            <div class="panel-form__row">
+                                <label>Формат
+                                    <select name="aspect_ratio">
+                                        <option value="auto"{% if photo.aspect_ratio == 'auto' %} selected{% endif %}>Авто</option>
+                                        <option value="1:1"{% if photo.aspect_ratio == '1:1' %} selected{% endif %}>1:1</option>
+                                        <option value="4:3"{% if photo.aspect_ratio == '4:3' %} selected{% endif %}>4:3</option>
+                                        <option value="16:9"{% if photo.aspect_ratio == '16:9' %} selected{% endif %}>16:9</option>
+                                        <option value="3:4"{% if photo.aspect_ratio == '3:4' %} selected{% endif %}>3:4</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+
+                        <label class="panel-muted">
+                            <input type="checkbox" name="is_active" {% if photo.is_active %}checked{% endif %}>
+                            Показывать (Да/Нет)
+                        </label>
+
+                        <label class="panel-muted">
+                            Заменить фото (не обязательно)
+                            <input type="file" name="image" accept="image/*">
+                        </label>
+
+                        <div class="panel-gallery-card__actions">
+                            <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
+                        </div>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="panel-hint">Пока нет фото коллажа.</p>
+    {% endif %}
+</section>
+
+<section class="panel-section">
+    <h2>Галерея на сайте (сколько угодно фото)</h2>
+
+    <p class="panel-hint">
+        Добавляйте хоть 100 фото. На странице они автоматически красиво распределяются в masonry.
+        Формат и “Показывать” можно менять у каждого фото без удаления.
     </p>
 
     <form method="post" enctype="multipart/form-data" class="panel-form panel-form--inline">
         {% csrf_token %}
         <input type="hidden" name="gallery_action" value="add">
+
         <p><label>Файл <input type="file" name="image" accept="image/*" required></label></p>
-        <p><label>Подпись <input type="text" name="title" placeholder="Например: Зона с окнами"></label></p>
+        <p><label>Подпись <input type="text" name="title" placeholder="Например: Интерьер"></label></p>
+
         <p><label>Формат
             <select name="aspect_ratio">
                 <option value="auto">Авто</option>
-                <option value="1:1">1:1 (квадрат)</option>
-                <option value="4:3">4:3 (горизонт)</option>
-                <option value="16:9">16:9 (широко)</option>
-                <option value="3:4">3:4 (вертикаль)</option>
+                <option value="1:1">1:1</option>
+                <option value="4:3">4:3</option>
+                <option value="16:9">16:9</option>
+                <option value="3:4">3:4</option>
             </select>
         </label></p>
-        <button type="submit" class="panel-btn panel-btn--primary">Добавить фото</button>
+
+        <label class="panel-muted">
+            <input type="checkbox" name="is_active" checked>
+            Показывать (Да/Нет)
+        </label>
+
+        <div class="panel-gallery-card__actions" style="margin-top: 12px;">
+            <button type="submit" class="panel-btn panel-btn--primary">Добавить фото</button>
+        </div>
     </form>
 
     {% if gallery_slides %}
-    <table class="panel-table panel-table--compact">
-        <thead>
-            <tr>
-                <th>Фото</th>
-                <th>Подпись</th>
-                <th>Формат</th>
-                <th>Порядок</th>
-                <th>Показывать</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
+        <div class="panel-gallery-cards">
             {% for slide in gallery_slides %}
-            <tr>
-                <td>{% if slide.image %}<img src="{{ slide.image.url }}" alt="" class="panel-thumb panel-thumb--lg">{% endif %}</td>
-                <td>{{ slide.title|default:'Без подписи' }}</td>
-                <td>{{ slide.aspect_ratio }}</td>
-                <td>{{ slide.order }}</td>
-                <td>{% if slide.is_active %}Да{% else %}Нет{% endif %}</td>
-                <td>
-                    <form method="post" class="panel-inline-form">
+                <div class="panel-gallery-card">
+                    {% if slide.image %}
+                        <img src="{{ slide.image.url }}" alt="" class="panel-gallery-card__img">
+                    {% endif %}
+
+                    <div class="panel-gallery-card__title">
+                        <div class="panel-hint">{{ slide.title|default:'Без подписи' }}</div>
+                        <div class="panel-gallery-card__slot">
+                            Формат: {{ slide.aspect_ratio }}
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" class="panel-form panel-gallery-card__form">
+                        {% csrf_token %}
+                        <input type="hidden" name="gallery_action" value="update">
+                        <input type="hidden" name="slide_id" value="{{ slide.id }}">
+
+                        <div class="panel-form__grid">
+                            <div class="panel-form__row">
+                                <label>Подпись
+                                    <input type="text" name="title" value="{{ slide.title|default:'' }}" placeholder="Подпись">
+                                </label>
+                            </div>
+
+                            <div class="panel-form__row">
+                                <label>Порядок
+                                    <input type="number" name="order" value="{{ slide.order|default:0 }}" min="0" step="1">
+                                </label>
+                            </div>
+
+                            <div class="panel-form__row">
+                                <label>Формат
+                                    <select name="aspect_ratio">
+                                        <option value="auto"{% if slide.aspect_ratio == 'auto' %} selected{% endif %}>Авто</option>
+                                        <option value="1:1"{% if slide.aspect_ratio == '1:1' %} selected{% endif %}>1:1</option>
+                                        <option value="4:3"{% if slide.aspect_ratio == '4:3' %} selected{% endif %}>4:3</option>
+                                        <option value="16:9"{% if slide.aspect_ratio == '16:9' %} selected{% endif %}>16:9</option>
+                                        <option value="3:4"{% if slide.aspect_ratio == '3:4' %} selected{% endif %}>3:4</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+
+                        <label class="panel-muted">
+                            <input type="checkbox" name="is_active" {% if slide.is_active %}checked{% endif %}>
+                            Показывать (Да/Нет)
+                        </label>
+
+                        <label class="panel-muted">
+                            Заменить фото (не обязательно)
+                            <input type="file" name="image" accept="image/*">
+                        </label>
+
+                        <div class="panel-gallery-card__actions">
+                            <button type="submit" class="panel-btn panel-btn--primary">Сохранить изменения</button>
+                        </div>
+                    </form>
+
+                    <form method="post" class="panel-gallery-card__delete" onsubmit="return confirm('Удалить фото из галереи?');">
                         {% csrf_token %}
                         <input type="hidden" name="gallery_action" value="delete">
                         <input type="hidden" name="slide_id" value="{{ slide.id }}">
-                        <button type="submit" class="panel-link-btn" onclick="return confirm('Удалить фото из галереи?')">Удалить</button>
+                        <button type="submit" class="panel-btn panel-btn--danger">Удалить</button>
                     </form>
-                </td>
-            </tr>
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
     {% else %}
-    <p class="panel-hint">Пока нет загруженных фото галереи.</p>
+        <p class="panel-hint">Пока нет загруженных фото галереи.</p>
     {% endif %}
 </section>
 {% endblock %}

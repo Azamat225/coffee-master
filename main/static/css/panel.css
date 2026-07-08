@@ -9,6 +9,17 @@
     --panel-danger: #a04444;
 }
 
+html[data-panel-theme="light"] {
+    --panel-bg: #F7F3ED;
+    --panel-surface: #FFFFFF;
+    --panel-border: rgba(44, 36, 28, 0.14);
+    --panel-text: #2C241C;
+    --panel-muted: #5E544A;
+    --panel-green: #3D6B4F;
+    --panel-green-hover: #2D5A3A;
+    --panel-danger: #A04444;
+}
+
 *,
 *::before,
 *::after {
@@ -21,6 +32,7 @@ body.panel-body {
     background: var(--panel-bg);
     color: var(--panel-text);
     min-height: 100vh;
+    transition: background 0.2s, color 0.2s;
 }
 
 .panel-top {
@@ -61,6 +73,23 @@ body.panel-body {
 }
 
 .panel-top__nav a:hover {
+    color: var(--panel-green);
+    background: rgba(61, 107, 79, 0.12);
+}
+
+.panel-top__nav .panel-theme-toggle {
+    color: var(--panel-muted);
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 0.88rem;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+}
+
+.panel-top__nav .panel-theme-toggle:hover {
     color: var(--panel-green);
     background: rgba(61, 107, 79, 0.12);
 }
@@ -679,4 +708,73 @@ body.panel-body {
     .panel-table td:nth-child(1) {
         display: none;
     }
+}
+
+/* ── Gallery editor cards ── */
+input[type="checkbox"] {
+    accent-color: var(--panel-green);
+}
+
+.panel-gallery-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 18px;
+}
+
+.panel-gallery-card {
+    background: var(--panel-surface);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+html[data-panel-theme="light"] .panel-gallery-card {
+    box-shadow: 0 10px 28px rgba(44, 36, 28, 0.08);
+}
+
+.panel-gallery-card__img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    display: block;
+}
+
+.panel-gallery-card__title {
+    margin-top: 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.panel-gallery-card__slot {
+    color: var(--panel-muted);
+    font-size: 0.85rem;
+}
+
+.panel-gallery-card__form {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.panel-gallery-card__form .panel-form__grid {
+    gap: 12px;
+}
+
+.panel-gallery-card__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.panel-gallery-card__delete {
+    margin-top: 10px;
 }

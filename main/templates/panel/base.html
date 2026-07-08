@@ -7,7 +7,13 @@
     <meta name="robots" content="noindex, nofollow">
     <title>{% block title %}Панель{% endblock %} — Green Studio</title>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/panel.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'css/panel.css' %}?v=6">
+    <script>
+        try {
+            const t = localStorage.getItem('gs-panel-theme');
+            if (t === 'light') document.documentElement.dataset.panelTheme = 'light';
+        } catch (e) {}
+    </script>
 </head>
 <body class="panel-body">
     {% if user.is_authenticated %}
@@ -19,6 +25,7 @@
             <a href="{% url 'panel_settings' %}" class="{% if request.resolver_match.url_name == 'panel_settings' %}panel-top__link panel-top__link--active{% endif %}">Сайт</a>
             <a href="{% url 'panel_images' %}" class="{% if request.resolver_match.url_name == 'panel_images' %}panel-top__link panel-top__link--active{% endif %}">Фото</a>
             <a href="{% url 'home' %}" target="_blank" class="panel-top__link">На сайт ↗</a>
+            <button type="button" id="panelThemeToggle" class="panel-theme-toggle panel-top__link" aria-label="Тема панели" aria-pressed="false">Тема</button>
             <a href="{% url 'panel_logout' %}" class="panel-top__link">Выйти</a>
         </nav>
     </header>
@@ -37,4 +44,5 @@
         </section>
     </main>
 </body>
+<script src="{% static 'js/panel-theme.js' %}?v=1"></script>
 </html>

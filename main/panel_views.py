@@ -3,7 +3,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Max
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
@@ -170,26 +170,62 @@ def panel_images(request):
                     messages.success(request, 'Изображение обновлено.')
                     return redirect('panel_images')
 
-        action = request.POST.get('gallery_action')
-        if action == 'add':
+        mosaic_action = request.POST.get('mosaic_action')
+        if mosaic_action == 'update':
+            slot = request.POST.get('mosaic_slot')
+            if not slot:
+                messages.error(request, 'Не задан слот коллажа.')
+            else:
+                obj = get_object_or_404(MosaicPhoto, slot=int(slot))
+                obj.alt_text = request.POST.get('alt_text', '').strip()
+                obj.aspect_ratio = request.POST.get('aspect_ratio') or 'auto'
+                obj.is_active = bool(request.POST.get('is_active'))
+                if request.FILES.get('image'):
+                    obj.image = request.FILES.get('image')
+                obj.save()
+                messages.success(request, f'Коллаж обновлён (ячейка {obj.slot}).')
+                return redirect('panel_images')
+
+        gallery_action = request.POST.get('gallery_action')
+        if gallery_action == 'add':
             image = request.FILES.get('image')
             if not image:
                 messages.error(request, 'Выберите файл для загрузки в галерею.')
             else:
                 title = request.POST.get('title', '').strip()
                 ratio = request.POST.get('aspect_ratio') or 'auto'
-                max_order = GallerySlide.objects.aggregate(max_order=Avg('order'))['max_order'] or 0
-                slide = GallerySlide.objects.create(
+                is_active = bool(request.POST.get('is_active'))
+
+                max_order = GallerySlide.objects.aggregate(max_order=Max('order'))['max_order'] or 0
+                GallerySlide.objects.create(
                     image=image,
                     title=title,
                     aspect_ratio=ratio,
                     order=int(max_order) + 1,
-                    is_active=True,
+                    is_active=is_active,
                 )
                 messages.success(request, 'Фото добавлено в галерею.')
                 return redirect('panel_images')
 
-        if action == 'delete':
+        if gallery_action == 'update':
+            slide_id = request.POST.get('slide_id')
+            if slide_id:
+                slide = get_object_or_404(GallerySlide, id=slide_id)
+                slide.title = request.POST.get('title', '').strip()
+                slide.aspect_ratio = request.POST.get('aspect_ratio') or 'auto'
+                # order обновляем только если валидное число
+                try:
+                    slide.order = int(request.POST.get('order', slide.order))
+                except (TypeError, ValueError):
+                    pass
+                slide.is_active = bool(request.POST.get('is_active'))
+                if request.FILES.get('image'):
+                    slide.image = request.FILES.get('image')
+                slide.save()
+                messages.success(request, 'Фото галереи обновлено.')
+                return redirect('panel_images')
+
+        if gallery_action == 'delete':
             slide_id = request.POST.get('slide_id')
             if slide_id:
                 slide = GallerySlide.objects.filter(id=slide_id).first()
@@ -201,6 +237,7 @@ def panel_images(request):
     return render(request, 'panel/images.html', {
         'hero': site_images.get('hero'),
         'about': site_images.get('about'),
+        'mosaic_photos': MosaicPhoto.objects.order_by('slot'),
         'gallery_slides': GallerySlide.objects.order_by('order', '-created_at'),
     })
 
