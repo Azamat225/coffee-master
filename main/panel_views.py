@@ -18,7 +18,7 @@ from .forms import (
     SiteImageForm,
     SiteSettingsForm,
 )
-from .models import Booking, Category, MenuItem, MenuTag, MosaicPhoto, Promotion, SiteImage, SiteSettings
+from .models import Category, GallerySlide, MenuItem, MenuTag, MosaicPhoto, Promotion, SiteImage, SiteSettings
 
 
 def staff_required(view):
@@ -60,7 +60,6 @@ def panel_dashboard(request):
     items = MenuItem.objects.prefetch_related('promotions')
     on_sale = [i for i in items if i.has_discount]
     unavailable = items.filter(is_available=False).count()
-    pending_bookings = Booking.objects.filter(status='pending').count()
     avg_price = items.aggregate(avg=Avg('price'))['avg']
     menu_count = items.count()
 
@@ -69,10 +68,8 @@ def panel_dashboard(request):
         'promo_count': Promotion.objects.filter(is_active=True).count(),
         'tag_count': MenuTag.objects.count(),
         'unavailable_count': unavailable,
-        'pending_bookings': pending_bookings,
         'on_sale': on_sale[:6],
         'avg_price': avg_price,
-        'recent_bookings': Booking.objects.order_by('-created_at')[:5],
         'popular_items': items.filter(is_popular=True)[:4],
     })
 
@@ -173,24 +170,38 @@ def panel_images(request):
                     messages.success(request, 'Изображение обновлено.')
                     return redirect('panel_images')
 
-        slot = request.POST.get('mosaic_slot')
-        if slot:
-            obj = MosaicPhoto.objects.filter(slot=int(slot)).first()
-            if obj is None and not request.FILES.get('image'):
-                messages.error(request, f'Ячейка {slot}: выберите файл.')
+        action = request.POST.get('gallery_action')
+        if action == 'add':
+            image = request.FILES.get('image')
+            if not image:
+                messages.error(request, 'Выберите файл для загрузки в галерею.')
             else:
-                if obj is None:
-                    obj = MosaicPhoto(slot=int(slot))
-                form = MosaicPhotoForm(request.POST, request.FILES, instance=obj)
-                if form.is_valid():
-                    form.save()
-                    messages.success(request, f'Коллаж — ячейка {slot} обновлена.')
+                title = request.POST.get('title', '').strip()
+                ratio = request.POST.get('aspect_ratio') or 'auto'
+                max_order = GallerySlide.objects.aggregate(max_order=Avg('order'))['max_order'] or 0
+                slide = GallerySlide.objects.create(
+                    image=image,
+                    title=title,
+                    aspect_ratio=ratio,
+                    order=int(max_order) + 1,
+                    is_active=True,
+                )
+                messages.success(request, 'Фото добавлено в галерею.')
+                return redirect('panel_images')
+
+        if action == 'delete':
+            slide_id = request.POST.get('slide_id')
+            if slide_id:
+                slide = GallerySlide.objects.filter(id=slide_id).first()
+                if slide:
+                    slide.delete()
+                    messages.success(request, 'Фото удалено из галереи.')
                     return redirect('panel_images')
 
     return render(request, 'panel/images.html', {
         'hero': site_images.get('hero'),
         'about': site_images.get('about'),
-        'mosaic': MosaicPhoto.objects.order_by('slot'),
+        'gallery_slides': GallerySlide.objects.order_by('order', '-created_at'),
     })
 
 
@@ -270,28 +281,3 @@ def panel_bulk_prices(request):
 
     return render(request, 'panel/bulk_prices.html', {'form': form})
 
-
-@login_required(login_url='panel_login')
-@staff_required
-def panel_bookings(request):
-    status_filter = request.GET.get('status', '')
-    bookings = Booking.objects.order_by('-date', '-time')
-    if status_filter:
-        bookings = bookings.filter(status=status_filter)
-
-    if request.method == 'POST':
-        booking = get_object_or_404(Booking, pk=request.POST.get('booking_id'))
-        new_status = request.POST.get('status')
-        valid = dict(Booking.STATUS_CHOICES)
-        if new_status in valid:
-            booking.status = new_status
-            booking.save(update_fields=['status'])
-            messages.success(request, f'Запись {booking.name}: {valid[new_status]}.')
-        return redirect('panel_bookings')
-
-    return render(request, 'panel/bookings.html', {
-        'bookings': bookings[:50],
-        'status_filter': status_filter,
-        'status_choices': Booking.STATUS_CHOICES,
-        'pending_count': Booking.objects.filter(status='pending').count(),
-    })

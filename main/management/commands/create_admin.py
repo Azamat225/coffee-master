@@ -8,20 +8,25 @@ class Command(BaseCommand):
     help = 'Создаёт или обновляет суперпользователя admin / admin123'
 
     def handle(self, *args, **options):
-        user, created = User.objects.get_or_create(
+        user, _created = User.objects.get_or_create(
             username='admin',
-            defaults={
-                'email': 'admin@green-cafe-str.ru',
-                'is_staff': True,
-                'is_superuser': True,
-            },
+            defaults={'email': 'admin@green-cafe-str.ru'},
         )
-        user.set_password('admin123')
+
+        # Явно приводим пользователя к ожидаемому состоянию.
+        user.email = user.email or 'admin@green-cafe-str.ru'
+        user.is_active = True
         user.is_staff = True
         user.is_superuser = True
-        user.save()
+        user.set_password('admin123')
+        user.save(
+            update_fields=[
+                'password',
+                'email',
+                'is_active',
+                'is_staff',
+                'is_superuser',
+            ]
+        )
 
-        if created:
-            self.stdout.write(self.style.SUCCESS('Создан admin / admin123'))
-        else:
-            self.stdout.write(self.style.SUCCESS('Пароль admin обновлён на admin123'))
+        self.stdout.write(self.style.SUCCESS('Гарантированно выставлен admin / admin123'))

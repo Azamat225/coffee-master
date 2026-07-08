@@ -2,12 +2,21 @@ from decimal import Decimal
 
 from django import forms
 
-from .models import Booking, Category, MenuItem, MenuTag, MosaicPhoto, Promotion, SiteImage, SiteSettings
+from .models import Category, MenuItem, MenuTag, MosaicPhoto, Promotion, SiteImage, SiteSettings
 
 
 class PanelLoginForm(forms.Form):
-    username = forms.CharField(label='Логин', max_length=150)
-    password = forms.CharField(label='Пароль', widget=forms.PasswordInput)
+    username = forms.CharField(
+        label='Логин',
+        max_length=150,
+        widget=forms.TextInput(attrs={'placeholder': 'admin', 'autocomplete': 'username'}),
+    )
+    password = forms.CharField(
+        label='Пароль',
+        widget=forms.PasswordInput(
+            attrs={'placeholder': 'admin123', 'autocomplete': 'current-password', 'autofocus': 'autofocus'}
+        ),
+    )
 
 
 class SiteSettingsForm(forms.ModelForm):
@@ -54,12 +63,6 @@ class BulkPriceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.all()
-
-
-class BookingStatusForm(forms.ModelForm):
-    class Meta:
-        model = Booking
-        fields = ['status']
 
 
 class MenuItemForm(forms.ModelForm):

@@ -3,14 +3,37 @@
 {% block title %}Вход{% endblock %}
 
 {% block content %}
-<div class="panel-login">
+<div class="panel-login" role="main" aria-label="Вход в панель">
     <div class="panel-login__card">
-        <h1 class="panel-login__title">Панель управления</h1>
-        <p class="panel-login__sub">Green Studio</p>
-        <form method="post" class="panel-form">
+        <div class="panel-login__brand">
+            <div class="panel-login__logo" aria-hidden="true">☕</div>
+            <div>
+                <h1 class="panel-login__title">Панель управления</h1>
+                <p class="panel-login__sub">Green Studio</p>
+            </div>
+        </div>
+
+        <div class="panel-callout">
+            <div class="panel-callout__title">Демо доступ</div>
+            <div class="panel-callout__text">Логин: <code>admin</code> · Пароль: <code>admin123</code></div>
+        </div>
+
+        <form method="post" class="panel-form panel-form--login">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="panel-btn panel-btn--primary">Войти</button>
+            <div class="panel-form__grid">
+                <div class="panel-form__row">
+                    <label for="{{ form.username.id_for_label }}">Логин</label>
+                    {{ form.username }}
+                </div>
+                <div class="panel-form__row">
+                    <label for="{{ form.password.id_for_label }}">Пароль</label>
+                    {{ form.password }}
+                </div>
+            </div>
+
+            <div class="panel-form__actions">
+                <button type="submit" class="panel-btn panel-btn--primary">Войти</button>
+            </div>
         </form>
     </div>
 </div>

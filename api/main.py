@@ -6,13 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import get_db
-from .models import Booking, MenuItem
-from .schemas import BookingCreate, BookingOut, MenuItemOut
+from .models import MenuItem
+from .schemas import MenuItemOut
 
 app = FastAPI(
-    title='Aroma Coffee API',
-    description='API для меню и записи в кофейню',
-    version='1.0.0',
+    title='Green Studio API',
+    description='API для меню кофейни',
+    version='1.1.0',
 )
 
 CORS_ORIGINS = [
@@ -77,28 +77,7 @@ def get_popular_menu(db: Session = Depends(get_db)):
     ]
 
 
-@app.post('/api/bookings', response_model=BookingOut, status_code=201)
-def create_booking(data: BookingCreate, db: Session = Depends(get_db)):
-    booking = Booking(
-        name=data.name,
-        phone=data.phone,
-        email=data.email,
-        date=data.date,
-        time=data.time,
-        guests=data.guests,
-        comment=data.comment,
-        status='pending',
-        created_at=datetime.utcnow(),
-    )
-    db.add(booking)
-    db.commit()
-    db.refresh(booking)
-    return booking
+@app.get('/api/bookings', include_in_schema=False)
+def bookings_disabled():
+    raise HTTPException(status_code=410, detail='Онлайн-запись больше недоступна')
 
-
-@app.get('/api/bookings/{booking_id}', response_model=BookingOut)
-def get_booking(booking_id: int, db: Session = Depends(get_db)):
-    booking = db.query(Booking).filter(Booking.id == booking_id).first()
-    if not booking:
-        raise HTTPException(status_code=404, detail='Запись не найдена')
-    return booking

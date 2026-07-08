@@ -30,28 +30,63 @@
 </section>
 
 <section class="panel-section">
-    <h2>Коллаж «Наше пространство»</h2>
-    {% for photo in mosaic %}
+    <h2>Галерея на сайте</h2>
+    <p class="panel-hint">
+        Добавляйте сколько угодно фото — они автоматически выстраиваются в галерее.
+        Можно загружать горизонтальные, вертикальные и квадратные кадры.
+    </p>
+
     <form method="post" enctype="multipart/form-data" class="panel-form panel-form--inline">
         {% csrf_token %}
-        <input type="hidden" name="mosaic_slot" value="{{ photo.slot }}">
-        <p><strong>Ячейка {{ photo.slot }}</strong></p>
-        {% if photo.image %}<img src="{{ photo.image.url }}" alt="" class="panel-thumb panel-thumb--lg">{% endif %}
-        <p><label>Новый файл <input type="file" name="image" accept="image/*"></label></p>
-        <p><label>Подпись <input type="text" name="alt_text" value="{{ photo.alt_text|default:'' }}"></label></p>
+        <input type="hidden" name="gallery_action" value="add">
+        <p><label>Файл <input type="file" name="image" accept="image/*" required></label></p>
+        <p><label>Подпись <input type="text" name="title" placeholder="Например: Зона с окнами"></label></p>
         <p><label>Формат
             <select name="aspect_ratio">
-                <option value="auto"{% if photo.aspect_ratio|default:'auto' == 'auto' %} selected{% endif %}>Авто</option>
-                <option value="1:1"{% if photo.aspect_ratio == '1:1' %} selected{% endif %}>1:1</option>
-                <option value="4:3"{% if photo.aspect_ratio == '4:3' %} selected{% endif %}>4:3</option>
-                <option value="16:9"{% if photo.aspect_ratio == '16:9' %} selected{% endif %}>16:9</option>
-                <option value="3:4"{% if photo.aspect_ratio == '3:4' %} selected{% endif %}>3:4</option>
+                <option value="auto">Авто</option>
+                <option value="1:1">1:1 (квадрат)</option>
+                <option value="4:3">4:3 (горизонт)</option>
+                <option value="16:9">16:9 (широко)</option>
+                <option value="3:4">3:4 (вертикаль)</option>
             </select>
-        </label></p>        <p><label><input type="checkbox" name="is_active" {% if photo.is_active %}checked{% endif %}> Показывать</label></p>
-        <button type="submit" class="panel-btn">Обновить</button>
+        </label></p>
+        <button type="submit" class="panel-btn panel-btn--primary">Добавить фото</button>
     </form>
-    {% empty %}
-    <p class="panel-hint">Запустите <code>python manage.py load_site_images --force</code></p>
-    {% endfor %}
+
+    {% if gallery_slides %}
+    <table class="panel-table panel-table--compact">
+        <thead>
+            <tr>
+                <th>Фото</th>
+                <th>Подпись</th>
+                <th>Формат</th>
+                <th>Порядок</th>
+                <th>Показывать</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for slide in gallery_slides %}
+            <tr>
+                <td>{% if slide.image %}<img src="{{ slide.image.url }}" alt="" class="panel-thumb panel-thumb--lg">{% endif %}</td>
+                <td>{{ slide.title|default:'Без подписи' }}</td>
+                <td>{{ slide.aspect_ratio }}</td>
+                <td>{{ slide.order }}</td>
+                <td>{% if slide.is_active %}Да{% else %}Нет{% endif %}</td>
+                <td>
+                    <form method="post" class="panel-inline-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="gallery_action" value="delete">
+                        <input type="hidden" name="slide_id" value="{{ slide.id }}">
+                        <button type="submit" class="panel-link-btn" onclick="return confirm('Удалить фото из галереи?')">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="panel-hint">Пока нет загруженных фото галереи.</p>
+    {% endif %}
 </section>
 {% endblock %}

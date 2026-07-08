@@ -7,20 +7,19 @@
     <meta name="robots" content="noindex, nofollow">
     <title>{% block title %}Панель{% endblock %} — Green Studio</title>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/panel.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/panel.css' %}?v=4">
 </head>
 <body class="panel-body">
     {% if user.is_authenticated %}
     <header class="panel-top">
         <a href="{% url 'panel_dashboard' %}" class="panel-top__brand">Green Studio · Панель</a>
         <nav class="panel-top__nav">
-            <a href="{% url 'panel_menu_list' %}">Меню</a>
-            <a href="{% url 'panel_promotions' %}">Акции</a>
-            <a href="{% url 'panel_settings' %}">Сайт</a>
-            <a href="{% url 'panel_bookings' %}">Записи</a>
-            <a href="{% url 'panel_images' %}">Фото</a>
-            <a href="{% url 'home' %}" target="_blank">На сайт ↗</a>
-            <a href="{% url 'panel_logout' %}">Выйти</a>
+            <a href="{% url 'panel_menu_list' %}" class="{% if request.resolver_match.url_name == 'panel_menu_list' %}panel-top__link panel-top__link--active{% endif %}">Меню</a>
+            <a href="{% url 'panel_promotions' %}" class="{% if request.resolver_match.url_name == 'panel_promotions' %}panel-top__link panel-top__link--active{% endif %}">Акции</a>
+            <a href="{% url 'panel_settings' %}" class="{% if request.resolver_match.url_name == 'panel_settings' %}panel-top__link panel-top__link--active{% endif %}">Сайт</a>
+            <a href="{% url 'panel_images' %}" class="{% if request.resolver_match.url_name == 'panel_images' %}panel-top__link panel-top__link--active{% endif %}">Фото</a>
+            <a href="{% url 'home' %}" target="_blank" class="panel-top__link">На сайт ↗</a>
+            <a href="{% url 'panel_logout' %}" class="panel-top__link">Выйти</a>
         </nav>
     </header>
     {% endif %}
@@ -33,7 +32,9 @@
             {% endfor %}
         </ul>
         {% endif %}
-        {% block content %}{% endblock %}
+        <section class="panel-page">
+            {% block content %}{% endblock %}
+        </section>
     </main>
 </body>
 </html>

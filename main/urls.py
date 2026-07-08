@@ -23,5 +23,4 @@ urlpatterns = [
     path('panel/settings/', panel_views.panel_settings, name='panel_settings'),
     path('panel/tags/', panel_views.panel_tags, name='panel_tags'),
     path('panel/bulk-prices/', panel_views.panel_bulk_prices, name='panel_bulk_prices'),
-    path('panel/bookings/', panel_views.panel_bookings, name='panel_bookings'),
 ]
