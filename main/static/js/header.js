@@ -1,8 +1,8 @@
 (function () {
     const header = document.getElementById('siteHeader');
-    const topbar = document.getElementById('topbar');
     const siteScroll = document.getElementById('siteScroll');
     const menuToggle = document.getElementById('menuToggle');
+    const siteNav = document.getElementById('siteNav');
 
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
@@ -19,87 +19,61 @@
         document.body.style.width = '100%';
     }
 
-    function resetScroll() {
-        if (siteScroll) siteScroll.scrollTop = 0;
-        window.scrollTo(0, 0);
-    }
-
     function syncLayout() {
-        if (!topbar || !header || !siteScroll) return;
+        if (!header || !siteScroll) return;
 
-        const topbarH = topbar.offsetHeight;
         const headerH = header.offsetHeight;
-        const scrollTop = topbarH + headerH;
-
-        topbar.style.position = 'fixed';
-        topbar.style.top = '0';
-        topbar.style.left = '0';
-        topbar.style.right = '0';
-        topbar.style.zIndex = '100002';
-
+        document.documentElement.style.setProperty('--site-header-h', headerH + 'px');
         header.style.position = 'fixed';
-        header.style.top = topbarH + 'px';
+        header.style.top = '0';
         header.style.left = '0';
         header.style.right = '0';
         header.style.zIndex = '100001';
 
         siteScroll.style.position = 'fixed';
-        siteScroll.style.top = scrollTop + 'px';
+        siteScroll.style.top = headerH + 'px';
         siteScroll.style.left = '0';
         siteScroll.style.right = '0';
         siteScroll.style.bottom = '0';
         siteScroll.style.overflowY = 'auto';
     }
 
-    function scrollToHash(hash) {
-        if (!hash || hash === '#' || !siteScroll) return;
-        const target = document.querySelector(hash);
-        if (!target) return;
-
-        const scrollRect = siteScroll.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
-        const top = siteScroll.scrollTop + targetRect.top - scrollRect.top;
-
-        siteScroll.scrollTo({ top: top, behavior: 'smooth' });
+    function closeMenu() {
+        if (header) header.classList.remove('site-header--open');
+        if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
     }
 
     lockPageScroll();
     syncLayout();
-    resetScroll();
 
     if (window.location.hash) {
         history.replaceState(null, '', window.location.pathname + window.location.search);
     }
 
     window.addEventListener('resize', syncLayout, { passive: true });
-    window.addEventListener('load', resetScroll);
-    window.addEventListener('pageshow', resetScroll);
+    window.addEventListener('load', syncLayout);
+    window.addEventListener('pageshow', syncLayout);
 
     window.addEventListener('scroll', function () {
         window.scrollTo(0, 0);
     }, { passive: true });
 
+    if (menuToggle && header) {
+        menuToggle.addEventListener('click', function () {
+            const open = header.classList.toggle('site-header--open');
+            menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    }
+
+    if (siteNav) {
+        siteNav.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', closeMenu);
+        });
+    }
+
     document.addEventListener('click', function (event) {
-        const link = event.target.closest('a[href^="#"]');
-        if (!link || !siteScroll) return;
-
-        const hash = link.getAttribute('href');
-        if (!hash || hash === '#') return;
-
-        const target = document.querySelector(hash);
-        if (!target) return;
-
-        event.preventDefault();
-        scrollToHash(hash);
-
-        if (header) header.classList.remove('header--open');
-        if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
-    });
-
-    if (!header || !menuToggle) return;
-
-    menuToggle.addEventListener('click', function () {
-        const open = header.classList.toggle('header--open');
-        menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (!header || !header.classList.contains('site-header--open')) return;
+        if (header.contains(event.target)) return;
+        closeMenu();
     });
 })();
