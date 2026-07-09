@@ -50,10 +50,8 @@
                 <span class="menu-card__badge">Хит</span>
             </div>
             <div class="menu-card__body">
-                <div class="menu-card__row">
-                    <h4 class="menu-card__name">{{ item.name }}</h4>
-                    <span class="menu-card__price">{{ item.get_effective_price|floatformat:0 }} ₽</span>
-                </div>
+                <h4 class="menu-card__name">{{ item.name }}</h4>
+                {% include 'main/includes/menu_prices.html' with item=item %}
             </div>
         </article>
         {% endfor %}

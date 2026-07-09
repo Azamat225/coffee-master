@@ -1,0 +1,39 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}Категории{% endblock %}
+
+{% block content %}
+<div class="panel-page-header">
+    <div class="panel-page-header__text">
+        <p class="panel-page-header__eyebrow">Каталог</p>
+        <h1 class="panel-h1">Категории меню</h1>
+        <p class="panel-hint">Напитки, десерты, выпечка — создавайте любые разделы для меню.</p>
+    </div>
+    <a href="{% url 'panel_category_add' %}" class="panel-btn panel-btn--primary">+ Категория</a>
+</div>
+
+<div class="panel-table-wrap">
+    <table class="panel-table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Позиций</th>
+                <th>Порядок</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cat in categories %}
+            <tr>
+                <td><strong>{{ cat.name }}</strong></td>
+                <td>{{ cat.item_count }}</td>
+                <td>{{ cat.order }}</td>
+                <td><a href="{% url 'panel_category_edit' cat.pk %}" class="panel-link">Изменить</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="panel-empty">Нет категорий. <a href="{% url 'panel_category_add' %}">Создать первую</a></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

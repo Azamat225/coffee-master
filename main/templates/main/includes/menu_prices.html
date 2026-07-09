@@ -1,0 +1,19 @@
+{% if item.get_price_lines %}
+<div class="menu-prices{% if compact %} menu-prices--compact{% endif %}{% if not item.has_variants %} menu-prices--single{% endif %}">
+    {% for line in item.get_price_lines %}
+    <div class="menu-prices__line{% if not line.label %} menu-prices__line--solo{% endif %}">
+        {% if line.label %}
+        <span class="menu-prices__vol">{{ line.label }}</span>
+        {% endif %}
+        <span class="menu-prices__amounts">
+            {% if line.has_discount %}
+            <span class="menu-prices__old">{{ line.price|floatformat:0 }} ₽</span>
+            <span class="menu-prices__sale">{{ line.effective_price|floatformat:0 }} ₽</span>
+            {% else %}
+            <span class="menu-prices__price">{{ line.effective_price|floatformat:0 }} ₽</span>
+            {% endif %}
+        </span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

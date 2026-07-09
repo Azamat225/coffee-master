@@ -35,12 +35,13 @@ class SiteImageAdmin(admin.ModelAdmin):
 
 @admin.register(MosaicPhoto)
 class MosaicPhotoAdmin(admin.ModelAdmin):
-    list_display = ('slot', 'image_preview', 'alt_text', 'is_active', 'updated_at')
-    list_editable = ('is_active',)
+    list_display = ('order', 'image_preview', 'alt_text', 'is_active', 'updated_at')
+    list_display_links = ('alt_text',)
+    list_editable = ('order', 'is_active')
     list_filter = ('is_active',)
-    ordering = ('slot',)
+    ordering = ('order', 'pk')
     readonly_fields = ('image_preview_large', 'updated_at')
-    fields = ('slot', 'image', 'image_preview_large', 'aspect_ratio', 'alt_text', 'is_active', 'updated_at')
+    fields = ('order', 'image', 'image_preview_large', 'aspect_ratio', 'alt_text', 'is_active', 'updated_at')
 
     @admin.display(description='Превью')
     def image_preview(self, obj):

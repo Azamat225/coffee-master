@@ -1,0 +1,29 @@
+{% extends 'panel/base.html' %}
+
+{% block title %}{% if category %}Категория{% else %}Новая категория{% endif %}{% endblock %}
+
+{% block content %}
+<div class="panel-page-header">
+    <div class="panel-page-header__text">
+        <p class="panel-page-header__eyebrow">Каталог</p>
+        <h1 class="panel-h1">{% if category %}{{ category.name }}{% else %}Новая категория{% endif %}</h1>
+        <p class="panel-hint">Например: Напитки, Десерты, Выпечка. Меньший порядок — выше в меню.</p>
+    </div>
+    <a href="{% url 'panel_categories' %}" class="panel-btn">← К списку</a>
+</div>
+
+<div class="panel-form-card panel-form-card--narrow">
+    <form method="post" class="panel-form panel-form--wide">
+        {% csrf_token %}
+        <div class="panel-form__fields">
+            {% include 'panel/includes/form_fields.html' with form=form %}
+        </div>
+        <div class="panel-form__actions">
+            <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
+            {% if category %}
+            <button type="submit" name="delete" value="1" class="panel-btn panel-btn--danger" onclick="return confirm('Удалить категорию?')">Удалить</button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

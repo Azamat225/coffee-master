@@ -7,13 +7,30 @@
     <div class="panel-page-header__text">
         <p class="panel-page-header__eyebrow">Каталог</p>
         <h1 class="panel-h1">Меню</h1>
-        <p class="panel-hint">Все напитки и блюда на сайте. Категория, цена, хит и наличие — в одной таблице.</p>
+        <p class="panel-hint">
+            {% if current_category %}
+            Категория «{{ current_category.name }}» — {{ items|length }} поз.
+            {% else %}
+            Все позиции. Фильтр по категориям — ниже.
+            {% endif %}
+        </p>
     </div>
     <div class="panel-head__actions">
+        <a href="{% url 'panel_categories' %}" class="panel-btn">Категории</a>
         <a href="{% url 'panel_bulk_prices' %}" class="panel-btn">Массовые цены</a>
         <a href="{% url 'panel_menu_add' %}" class="panel-btn panel-btn--primary">+ Добавить</a>
     </div>
 </div>
+
+<nav class="panel-filters" aria-label="Фильтр по категориям">
+    <a href="{% url 'panel_menu_list' %}" class="panel-filter{% if not current_category %} panel-filter--active{% endif %}">Все</a>
+    {% for cat in categories %}
+    <a href="{% url 'panel_menu_list' %}?category={{ cat.slug }}" class="panel-filter{% if current_category and current_category.pk == cat.pk %} panel-filter--active{% endif %}">
+        {{ cat.name }}
+        <span class="panel-filter__count">{{ cat.item_count }}</span>
+    </a>
+    {% endfor %}
+</nav>
 
 <div class="panel-table-wrap">
     <table class="panel-table">
@@ -35,7 +52,7 @@
                     {% if item.image %}
                     <img src="{{ item.image.url }}" alt="" class="panel-thumb">
                     {% else %}
-                    <span class="panel-thumb panel-thumb--empty">☕</span>
+                    <span class="panel-thumb panel-thumb--empty" title="Без фото">—</span>
                     {% endif %}
                 </td>
                 <td>
@@ -43,9 +60,37 @@
                     {% if item.is_popular %}<span class="panel-pill panel-pill--hit">Хит</span>{% endif %}
                 </td>
                 <td><span class="panel-cat">{{ item.category.name }}</span></td>
-                <td>{{ item.price|floatformat:0 }} ₽</td>
                 <td>
-                    {% if item.has_discount %}
+                    {% if item.has_variants %}
+                    <div class="panel-price-lines">
+                        {% for line in item.get_price_lines %}
+                        <div class="panel-price-lines__row">
+                            {% if line.label %}<span class="panel-price-lines__vol">{{ line.label }}</span>{% endif %}
+                            <span class="panel-price-lines__amount">{{ line.effective_price|floatformat:0 }} ₽</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% elif item.price is not None %}
+                    {{ item.price|floatformat:0 }} ₽
+                    {% else %}<span class="panel-muted">—</span>{% endif %}
+                </td>
+                <td>
+                    {% if item.has_variants %}
+                        {% if item.has_discount %}
+                        <div class="panel-price-lines">
+                            {% for line in item.get_price_lines %}
+                            {% if line.has_discount %}
+                            <div class="panel-price-lines__row">
+                                {% if line.label %}<span class="panel-price-lines__vol">{{ line.label }}</span>{% endif %}
+                                <span class="panel-sale">{{ line.effective_price|floatformat:0 }} ₽</span>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <span class="panel-muted">—</span>
+                        {% endif %}
+                    {% elif item.has_discount %}
                     <span class="panel-sale">{{ item.get_effective_price|floatformat:0 }} ₽</span>
                     {% else %}<span class="panel-muted">—</span>{% endif %}
                 </td>
@@ -61,10 +106,20 @@
                         <button type="submit" class="panel-toggle panel-toggle--star{% if item.is_popular %} panel-toggle--on{% endif %}" title="Хит">★</button>
                     </form>
                 </td>
-                <td><a href="{% url 'panel_menu_edit' item.pk %}" class="panel-link">Изменить</a></td>
+                <td>
+                    <a href="{% url 'panel_menu_edit' item.pk %}{% if current_category %}?category={{ current_category.slug }}{% endif %}" class="panel-link">Изменить</a>
+                </td>
             </tr>
             {% empty %}
-            <tr><td colspan="7" class="panel-empty">Пока нет позиций. <a href="{% url 'panel_menu_add' %}">Добавить первую</a></td></tr>
+            <tr>
+                <td colspan="7" class="panel-empty">
+                    {% if current_category %}
+                    В категории «{{ current_category.name }}» пока нет позиций.
+                    {% else %}
+                    Пока нет позиций. <a href="{% url 'panel_menu_add' %}">Добавить первую</a>
+                    {% endif %}
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>

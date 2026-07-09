@@ -1,7 +1,9 @@
+from django.db.models import Prefetch
+
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from .models import GallerySlide, MenuItem, MosaicPhoto, Promotion, SiteImage
+from .models import Category, GallerySlide, MenuItem, MosaicPhoto, Promotion, SiteImage
 
 
 def robots_txt(request):
@@ -27,13 +29,13 @@ def _aspect_class(ratio):
 
 def _build_gallery_items():
     items = []
-    for photo in MosaicPhoto.objects.filter(is_active=True).order_by('slot'):
+    for photo in MosaicPhoto.objects.filter(is_active=True).order_by('order', 'pk'):
         ratio = getattr(photo, 'aspect_ratio', 'auto')
         items.append({
             'image': photo.image,
             'title': photo.alt_text,
             'aspect_class': _aspect_class(ratio),
-            'sort': photo.slot,
+            'sort': photo.order,
         })
     for slide in GallerySlide.objects.filter(is_active=True).order_by('order', '-created_at'):
         ratio = getattr(slide, 'aspect_ratio', 'auto')
@@ -47,23 +49,49 @@ def _build_gallery_items():
     return items
 
 
+def _menu_item_queryset():
+    return (
+        MenuItem.objects.filter(is_available=True)
+        .prefetch_related('tags', 'promotions', 'variants')
+        .order_by('order', 'name')
+    )
+
+
+def _build_menu_categories():
+    available = _menu_item_queryset()
+    categories = Category.objects.prefetch_related(
+        Prefetch('items', queryset=available)
+    ).order_by('order', 'name')
+
+    sections = []
+    for category in categories:
+        items = list(category.items.all())
+        if not items:
+            continue
+        with_photo = [item for item in items if item.has_image]
+        without_photo = [item for item in items if not item.has_image]
+        sections.append({
+            'category': category,
+            'with_photo': with_photo,
+            'without_photo': without_photo,
+        })
+    return sections
+
+
 def home(request):
     return render(request, 'main/home.html', {
         'site_images': _site_images(),
         'popular_items': (
             MenuItem.objects.filter(is_available=True, is_popular=True)
-            .prefetch_related('tags', 'promotions')[:4]
+            .prefetch_related('tags', 'promotions', 'variants')[:4]
         ),
     })
 
 
 def menu_page(request):
-    menu_items = (
-        MenuItem.objects.filter(is_available=True)
-        .prefetch_related('tags', 'promotions')
-        .order_by('category__order', 'order', 'name')
-    )
-    return render(request, 'main/menu.html', {'menu_items': menu_items})
+    return render(request, 'main/menu.html', {
+        'menu_categories': _build_menu_categories(),
+    })
 
 
 def promotions_page(request):

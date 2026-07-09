@@ -10,17 +10,20 @@
     <p class="subpage-hero__desc">Авторские напитки, десерты и позиции, которые мы готовим с вниманием к деталям.</p>
 </section>
 
-{% if menu_items %}
-<section class="section scroll-rise">
+{% if menu_categories %}
+{% for section in menu_categories %}
+<section class="menu-category section scroll-rise" id="cat-{{ section.category.slug }}">
+    <div class="section__head">
+        <p class="section__label">Категория</p>
+        <h2 class="section__title">{{ section.category.name }}</h2>
+    </div>
+
+    {% if section.with_photo %}
     <div class="menu-grid">
-        {% for item in menu_items %}
+        {% for item in section.with_photo %}
         <article class="menu-card scroll-rise{% if item.is_popular %} menu-card--popular{% endif %}{% if item.has_discount %} menu-card--sale{% endif %}" style="--delay: {{ forloop.counter0 }}">
             <div class="menu-card__media">
-                {% if item.image %}
                 <img src="{{ item.image.url }}" alt="{{ item.name }}" class="menu-card__img">
-                {% else %}
-                <div class="menu-card__placeholder"></div>
-                {% endif %}
                 {% if item.has_discount %}
                 <span class="menu-card__badge menu-card__badge--sale">{{ item.discount_label }}</span>
                 {% elif item.is_popular %}
@@ -28,17 +31,8 @@
                 {% endif %}
             </div>
             <div class="menu-card__body">
-                <div class="menu-card__row">
-                    <h4 class="menu-card__name">{{ item.name }}</h4>
-                    <div class="menu-card__prices">
-                        {% if item.has_discount %}
-                        <span class="menu-card__price menu-card__price--old">{{ item.price|floatformat:0 }} ₽</span>
-                        <span class="menu-card__price menu-card__price--sale">{{ item.get_effective_price|floatformat:0 }} ₽</span>
-                        {% else %}
-                        <span class="menu-card__price">{{ item.price|floatformat:0 }} ₽</span>
-                        {% endif %}
-                    </div>
-                </div>
+                <h4 class="menu-card__name">{{ item.name }}</h4>
+                {% include 'main/includes/menu_prices.html' with item=item %}
                 {% if item.description %}
                 <p class="menu-card__desc">{{ item.description }}</p>
                 {% endif %}
@@ -53,7 +47,38 @@
         </article>
         {% endfor %}
     </div>
+    {% endif %}
+
+    {% if section.without_photo %}
+    <div class="menu-list{% if section.with_photo %} menu-list--below{% endif %}">
+        {% for item in section.without_photo %}
+        <article class="menu-list__item scroll-rise{% if item.is_popular %} menu-list__item--popular{% endif %}" style="--delay: {{ forloop.counter0 }}">
+            <div class="menu-list__main">
+                <div class="menu-list__head">
+                    <h4 class="menu-list__name">{{ item.name }}</h4>
+                    {% if item.is_popular %}<span class="menu-card__badge menu-card__badge--inline">Хит</span>{% endif %}
+                    {% if item.has_discount %}<span class="menu-card__badge menu-card__badge--sale menu-card__badge--inline">{{ item.discount_label }}</span>{% endif %}
+                </div>
+                {% if item.description %}
+                <p class="menu-list__desc">{{ item.description }}</p>
+                {% endif %}
+                {% if item.tags.exists %}
+                <div class="menu-card__tags">
+                    {% for tag in item.tags.all %}
+                    <span class="menu-card__tag">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="menu-list__prices">
+                {% include 'main/includes/menu_prices.html' with item=item compact=True %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% endif %}
 </section>
+{% endfor %}
 {% else %}
 <section class="section">
     <p class="empty-page">Меню скоро появится. Загляните позже!</p>
@@ -62,5 +87,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/scroll-effects.js' %}?v=3"></script>
+<script src="{% static 'js/scroll-effects.js' %}?v=4"></script>
 {% endblock %}

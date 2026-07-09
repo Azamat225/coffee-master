@@ -1,0 +1,18 @@
+<div class="panel-variants__row" data-variant-row>
+    {% for hidden in vform.hidden_fields %}
+        {% if hidden.name != 'DELETE' %}{{ hidden }}{% endif %}
+    {% endfor %}
+    <input type="hidden" name="{{ vform.prefix }}-DELETE" id="{{ vform.prefix }}-DELETE" value="">
+    <div class="panel-variants__fields">
+        {% for field in vform.visible_fields %}
+        {% if field.name != 'DELETE' %}
+        <div class="panel-field panel-field--inline">
+            <label class="panel-field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}<p class="panel-field__error">{{ error }}</p>{% endfor %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <button type="button" class="panel-variant-remove" data-variant-remove title="Убрать строку" aria-label="Убрать строку">✕</button>
+</div>

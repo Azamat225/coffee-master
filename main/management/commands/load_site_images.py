@@ -10,7 +10,7 @@ from main.models import MosaicPhoto, SiteImage
 STATIC_DIR = Path(__file__).resolve().parent.parent.parent / 'static' / 'images' / 'gallery'
 COLLAGE_DIR = STATIC_DIR / 'collage'
 
-MOSAIC_SLOTS = [
+MOSAIC_ITEMS = [
     (1, 'collage-03.png', 'Зал студии'),
     (2, 'collage-01.png', 'Авторский напиток'),
     (3, 'collage-02.png', 'Кофе и десерты'),
@@ -60,9 +60,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'  + {obj.get_key_display()}'))
 
     def _load_mosaic(self, force):
-        for slot, filename, alt in MOSAIC_SLOTS:
-            if MosaicPhoto.objects.filter(slot=slot).exists() and not force:
-                self.stdout.write(f'  ~ Коллаж ячейка {slot} уже есть')
+        for order, filename, alt in MOSAIC_ITEMS:
+            if MosaicPhoto.objects.filter(order=order).exists() and not force:
+                self.stdout.write(f'  ~ Коллаж #{order} уже есть')
                 continue
 
             src = COLLAGE_DIR / filename
@@ -71,9 +71,9 @@ class Command(BaseCommand):
                 continue
 
             obj, _ = MosaicPhoto.objects.update_or_create(
-                slot=slot,
+                order=order,
                 defaults={'alt_text': alt, 'is_active': True},
             )
             with open(src, 'rb') as f:
                 obj.image.save(filename, File(f), save=True)
-            self.stdout.write(self.style.SUCCESS(f'  + Коллаж — ячейка {slot}'))
+            self.stdout.write(self.style.SUCCESS(f'  + Коллаж — порядок {order}'))

@@ -77,7 +77,14 @@ class MenuItem(models.Model):
     )
     name = models.CharField('Название', max_length=150)
     description = models.TextField('Описание', blank=True)
-    price = models.DecimalField('Цена', max_digits=8, decimal_places=2)
+    price = models.DecimalField(
+        'Цена',
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text='Для десертов и позиций с одной ценой. Для напитков с объёмами оставьте пустым.',
+    )
     sale_price = models.DecimalField(
         'Цена со скидкой',
         max_digits=8,
@@ -101,21 +108,81 @@ class MenuItem(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def has_image(self):
+        return bool(self.image)
+
+    @property
+    def has_variants(self):
+        prefetched = getattr(self, '_prefetched_objects_cache', None)
+        if prefetched is not None and 'variants' in prefetched:
+            return bool(prefetched['variants'])
+        return self.variants.exists()
+
+    def get_variants(self):
+        return self.variants.order_by('order', 'volume_ml', 'pk')
+
     def get_active_promotion(self):
         return self.promotions.filter(is_active=True).order_by('order').first()
 
-    def get_effective_price(self):
-        if self.sale_price is not None:
-            return self.sale_price
+    def _apply_promo(self, base_price):
+        if base_price is None:
+            return None
         promo = self.get_active_promotion()
         if promo and promo.discount_percent:
-            discounted = self.price * (1 - promo.discount_percent / Decimal('100'))
+            discounted = base_price * (1 - promo.discount_percent / Decimal('100'))
             return discounted.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
-        return self.price
+        return base_price
+
+    def get_effective_price(self):
+        if self.has_variants:
+            prices = [v.get_effective_price() for v in self.get_variants()]
+            return min(prices) if prices else Decimal('0')
+        if self.sale_price is not None:
+            return self.sale_price
+        return self._apply_promo(self.price) or Decimal('0')
+
+    def get_price_display_short(self):
+        if self.has_variants:
+            parts = []
+            for variant in self.get_variants():
+                label = variant.volume_label
+                price = variant.get_effective_price()
+                parts.append(f'{label} — {price:.0f} ₽' if label else f'{price:.0f} ₽')
+            return ', '.join(parts)
+        if self.price is not None:
+            return f'{self.get_effective_price():.0f} ₽'
+        return '—'
+
+    def get_price_lines(self):
+        lines = []
+        if self.has_variants:
+            for variant in self.get_variants():
+                effective = variant.get_effective_price()
+                lines.append({
+                    'label': variant.volume_label,
+                    'price': variant.price,
+                    'effective_price': effective,
+                    'has_discount': effective < variant.price,
+                })
+        elif self.price is not None:
+            effective = self.get_effective_price()
+            lines.append({
+                'label': '',
+                'price': self.price,
+                'effective_price': effective,
+                'has_discount': effective < self.price,
+            })
+        return lines
 
     @property
     def has_discount(self):
-        return self.get_effective_price() < self.price
+        if self.has_variants:
+            return any(line['has_discount'] for line in self.get_price_lines())
+        if self.sale_price is not None and self.price is not None:
+            return self.sale_price < self.price
+        promo = self.get_active_promotion()
+        return bool(promo and promo.discount_percent)
 
     @property
     def discount_label(self):
@@ -123,6 +190,50 @@ class MenuItem(models.Model):
         if promo:
             return promo.title
         return 'Скидка'
+
+    def sync_base_price_from_variants(self):
+        if self.has_variants:
+            self.price = min(v.price for v in self.get_variants())
+        return self.price
+
+
+class MenuItemVariant(models.Model):
+    menu_item = models.ForeignKey(
+        MenuItem,
+        on_delete=models.CASCADE,
+        related_name='variants',
+        verbose_name='Позиция',
+    )
+    volume_ml = models.PositiveIntegerField('Объём, мл', null=True, blank=True)
+    price = models.DecimalField('Цена', max_digits=8, decimal_places=2)
+    sale_price = models.DecimalField(
+        'Цена со скидкой',
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    order = models.PositiveIntegerField('Порядок', default=0)
+
+    class Meta:
+        verbose_name = 'Объём и цена'
+        verbose_name_plural = 'Объёмы и цены'
+        ordering = ['order', 'volume_ml', 'pk']
+
+    def __str__(self):
+        label = self.volume_label
+        return f'{self.menu_item.name} {label} — {self.price} ₽'
+
+    @property
+    def volume_label(self):
+        if self.volume_ml:
+            return f'{self.volume_ml} мл'
+        return ''
+
+    def get_effective_price(self):
+        if self.sale_price is not None:
+            return self.sale_price
+        return self.menu_item._apply_promo(self.price)
 
 
 class Booking(models.Model):
@@ -239,15 +350,7 @@ class SiteImage(models.Model):
 class MosaicPhoto(models.Model):
     ASPECT_RATIO_CHOICES = GallerySlide.ASPECT_RATIO_CHOICES
 
-    SLOT_CHOICES = [
-        (1, '1 — большая слева'),
-        (2, '2 — широкая справа сверху'),
-        (3, '3 — маленькая по центру'),
-        (4, '4 — широкая снизу'),
-        (5, '5 — высокая справа'),
-    ]
-
-    slot = models.PositiveSmallIntegerField('Ячейка', choices=SLOT_CHOICES, unique=True)
+    order = models.PositiveIntegerField('Порядок', default=0)
     image = models.ImageField('Фото', upload_to='mosaic/')
     aspect_ratio = models.CharField(
         'Формат',
@@ -263,7 +366,97 @@ class MosaicPhoto(models.Model):
     class Meta:
         verbose_name = 'Фото коллажа'
         verbose_name_plural = 'Коллаж «Наше пространство»'
-        ordering = ['slot']
+        ordering = ['order', 'pk']
 
     def __str__(self):
-        return f'Ячейка {self.slot}' + (f' — {self.alt_text}' if self.alt_text else '')
+        label = self.alt_text or f'Фото #{self.pk}'
+        return f'{label} (порядок {self.order})'
+
+
+class BulkPriceAdjustment(models.Model):
+    ACTION_INCREASE = 'increase'
+    ACTION_DECREASE = 'decrease'
+    ACTION_CHOICES = [
+        (ACTION_INCREASE, 'Поднять'),
+        (ACTION_DECREASE, 'Снизить'),
+    ]
+
+    action = models.CharField('Действие', max_length=10, choices=ACTION_CHOICES)
+    percent = models.DecimalField('Процент', max_digits=5, decimal_places=2)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='bulk_price_adjustments',
+        verbose_name='Категория',
+    )
+    items_count = models.PositiveIntegerField('Позиций', default=0)
+    created_at = models.DateTimeField('Применено', auto_now_add=True)
+    created_by = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Кто применил',
+    )
+
+    class Meta:
+        verbose_name = 'Массовое изменение цен'
+        verbose_name_plural = 'Массовые изменения цен'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.summary
+
+    @property
+    def summary(self):
+        verb = 'Поднятие' if self.action == self.ACTION_INCREASE else 'Снижение'
+        scope = self.category.name if self.category_id else 'Все позиции'
+        return f'{verb} на {self.percent:.0f}% — {scope}'
+
+    @property
+    def action_label(self):
+        return 'Поднять' if self.action == self.ACTION_INCREASE else 'Снизить'
+
+
+class BulkPriceSnapshot(models.Model):
+    adjustment = models.ForeignKey(
+        BulkPriceAdjustment,
+        on_delete=models.CASCADE,
+        related_name='snapshots',
+        verbose_name='Изменение',
+    )
+    menu_item = models.ForeignKey(
+        MenuItem,
+        on_delete=models.CASCADE,
+        related_name='price_snapshots',
+        verbose_name='Позиция',
+    )
+    variant = models.ForeignKey(
+        MenuItemVariant,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='price_snapshots',
+        verbose_name='Объём',
+    )
+    old_price = models.DecimalField(
+        'Было: цена',
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    old_sale_price = models.DecimalField(
+        'Было: цена со скидкой',
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = 'Снимок цены'
+        verbose_name_plural = 'Снимки цен'
+        ordering = ['menu_item_id', 'variant_id']

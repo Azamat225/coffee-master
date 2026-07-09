@@ -7,20 +7,64 @@
     <div class="panel-page-header__text">
         <p class="panel-page-header__eyebrow">Меню</p>
         <h1 class="panel-h1">Массовое изменение цен</h1>
-        <p class="panel-hint">Поднимите или снизьте цены сразу на все позиции или только в одной категории. Скидочные цены тоже пересчитаются.</p>
+        <p class="panel-hint">Поднимите или снизьте цены сразу. Каждое изменение сохраняется — его можно отменить и вернуть старые цены.</p>
     </div>
     <a href="{% url 'panel_menu_list' %}" class="panel-btn">← К меню</a>
 </div>
 
-<div class="panel-form-card panel-form-card--narrow">
-    <form method="post" class="panel-form panel-form--wide">
-        {% csrf_token %}
-        <div class="panel-form__fields">
-            {% include 'panel/includes/form_fields.html' with form=form %}
+<div class="panel-bulk-layout">
+    <section class="panel-section panel-section--card panel-bulk-layout__form">
+        <h2 class="panel-section__title">Новое изменение</h2>
+        <p class="panel-hint panel-section__desc">Пересчитываются обычные и скидочные цены, в том числе по объёмам.</p>
+        <form method="post" class="panel-form">
+            {% csrf_token %}
+            <div class="panel-form__fields">
+                {% include 'panel/includes/form_fields.html' with form=form %}
+            </div>
+            <div class="panel-form__actions">
+                <button type="submit" class="panel-btn panel-btn--primary" onclick="return confirm('Применить изменение цен?')">Применить</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel-section panel-section--card panel-bulk-layout__history">
+        <h2 class="panel-section__title">История изменений</h2>
+        <p class="panel-hint panel-section__desc">
+            {% if adjustments %}
+            Активных записей: {{ adjustments|length }}. Отмена вернёт цены к состоянию до применения.
+            {% else %}
+            Пока нет массовых изменений — после первого применения они появятся здесь.
+            {% endif %}
+        </p>
+
+        {% if adjustments %}
+        <div class="panel-bulk-history">
+            {% for adj in adjustments %}
+            <article class="panel-bulk-card">
+                <div class="panel-bulk-card__main">
+                    <p class="panel-bulk-card__title">{{ adj.summary }}</p>
+                    <p class="panel-bulk-card__meta">
+                        {{ adj.created_at|date:"d.m.Y H:i" }}
+                        · {{ adj.items_count }} поз.
+                        {% if adj.created_by %}· {{ adj.created_by.username }}{% endif %}
+                    </p>
+                </div>
+                <div class="panel-bulk-card__actions">
+                    <span class="panel-bulk-card__badge panel-bulk-card__badge--{% if adj.action == 'increase' %}up{% else %}down{% endif %}">
+                        {{ adj.action_label }} {{ adj.percent|floatformat:0 }}%
+                    </span>
+                    <form method="post" onsubmit="return confirm('Отменить это изменение и вернуть старые цены?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_adjustment" value="{{ adj.pk }}">
+                        <button type="submit" class="panel-btn panel-btn--danger panel-btn--sm">Отменить</button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
         </div>
-        <div class="panel-form__actions">
-            <button type="submit" class="panel-btn panel-btn--primary" onclick="return confirm('Применить изменение цен?')">Применить</button>
-        </div>
-    </form>
+        {% else %}
+        <p class="panel-empty panel-empty--inline">История пуста.</p>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}

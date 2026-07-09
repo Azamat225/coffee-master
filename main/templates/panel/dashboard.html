@@ -42,8 +42,7 @@
         {% for item in on_sale %}
         <li>
             <span>{{ item.name }} <span class="panel-cat panel-cat--inline">{{ item.category.name }}</span></span>
-            <span class="panel-sale">{{ item.get_effective_price|floatformat:0 }} ₽</span>
-            <span class="panel-muted"><s>{{ item.price|floatformat:0 }} ₽</s></span>
+            <span class="panel-sale">{{ item.get_price_display_short }}</span>
         </li>
         {% endfor %}
     </ul>

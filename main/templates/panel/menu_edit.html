@@ -1,4 +1,5 @@
 {% extends 'panel/base.html' %}
+{% load static %}
 
 {% block title %}{% if item %}Редактировать{% else %}Новая позиция{% endif %}{% endblock %}
 
@@ -7,18 +8,125 @@
     <div class="panel-page-header__text">
         <p class="panel-page-header__eyebrow">{% if item %}{{ item.category.name }}{% else %}Новая запись{% endif %}</p>
         <h1 class="panel-h1">{% if item %}{{ item.name }}{% else %}Новая позиция{% endif %}</h1>
-        <p class="panel-hint">Заполните категорию, цену и фото — позиция появится на странице «Меню»{% if item.is_popular %} и в «Хитах» на главной{% endif %}.</p>
+        <p class="panel-hint">Напитки — цены по объёмам. Десерты и выпечка — одна цена.</p>
     </div>
-    <a href="{% url 'panel_menu_list' %}" class="panel-btn">← К списку</a>
+    <a href="{% url 'panel_menu_list' %}{% if request.GET.category %}?category={{ request.GET.category }}{% endif %}" class="panel-btn">← К списку</a>
 </div>
 
-<div class="panel-form-card">
-    <form method="post" enctype="multipart/form-data" class="panel-form panel-form--wide">
+<div class="panel-form-card panel-menu-edit{% if not item or not item.image %} panel-menu-edit--no-preview{% endif %}">
+    <form
+        method="post"
+        enctype="multipart/form-data"
+        class="panel-form panel-form--menu"
+        id="menu-item-form"
+        data-variant-prefix="{{ formset.prefix }}"
+        data-min-variant-rows="{% if item and item.has_variants %}0{% else %}2{% endif %}"
+    >
         {% csrf_token %}
-        <div class="panel-form__fields">
-            {% include 'panel/includes/form_fields.html' with form=form %}
+
+        <div class="panel-menu-edit__main">
+            <section class="panel-menu-section">
+                <h3 class="panel-menu-section__title">Основное</h3>
+                <div class="panel-form__fields panel-form__fields--grid">
+                    {% for field in form %}
+                    {% if field.name == 'category' or field.name == 'name' or field.name == 'description' or field.name == 'image' or field.name == 'order' %}
+                    <div class="panel-field{% if field.errors %} panel-field--error{% endif %}{% if field.name == 'description' %} panel-field--wide{% endif %}">
+                        <label class="panel-field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<p class="panel-field__help">{{ field.help_text }}</p>{% endif %}
+                        {% for error in field.errors %}<p class="panel-field__error">{{ error }}</p>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="panel-menu-section">
+                <h3 class="panel-menu-section__title">Настройки</h3>
+                <div class="panel-form__toggles">
+                    {% for field in form %}
+                    {% if field.name == 'is_popular' or field.name == 'is_available' %}
+                    <label class="panel-field panel-field--checkbox{% if field.errors %} panel-field--error{% endif %}">
+                        {{ field }}
+                        <span class="panel-field__label panel-field__label--inline">{{ field.label }}</span>
+                    </label>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="panel-menu-section">
+                <h3 class="panel-menu-section__title">Теги</h3>
+                {% for field in form %}
+                {% if field.name == 'tags' %}
+                <div class="panel-field panel-tags-picker{% if field.errors %} panel-field--error{% endif %}">
+                    {{ field }}
+                    {% for error in field.errors %}<p class="panel-field__error">{{ error }}</p>{% endfor %}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </section>
+
+            <section class="panel-menu-section panel-pricing">
+                <div class="panel-pricing__head">
+                    <h3 class="panel-menu-section__title">Цена</h3>
+                    <p class="panel-hint">Выберите тип — откроется только нужный блок.</p>
+                </div>
+
+                <div class="panel-field panel-pricing__mode{% if form.pricing_mode.errors %} panel-field--error{% endif %}">
+                    <span class="panel-field__label">Тип цены</span>
+                    <div class="panel-pricing__radios">
+                        {% for radio in form.pricing_mode %}
+                        <label class="panel-pricing__radio">
+                            {{ radio.tag }}
+                            <span class="panel-pricing__radio-text">{{ radio.choice_label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% for error in form.pricing_mode.errors %}
+                    <p class="panel-field__error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <div class="panel-pricing__block" data-pricing="single">
+                    <p class="panel-pricing__block-title">Фиксированная цена</p>
+                    <div class="panel-pricing__grid">
+                        <div class="panel-field{% if form.price.errors %} panel-field--error{% endif %}">
+                            <label class="panel-field__label" for="{{ form.price.id_for_label }}">{{ form.price.label }}</label>
+                            {{ form.price }}
+                            {% if form.price.help_text %}<p class="panel-field__help">{{ form.price.help_text }}</p>{% endif %}
+                            {% for error in form.price.errors %}<p class="panel-field__error">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="panel-field{% if form.sale_price.errors %} panel-field--error{% endif %}">
+                            <label class="panel-field__label" for="{{ form.sale_price.id_for_label }}">{{ form.sale_price.label }}</label>
+                            {{ form.sale_price }}
+                            {% if form.sale_price.help_text %}<p class="panel-field__help">{{ form.sale_price.help_text }}</p>{% endif %}
+                            {% for error in form.sale_price.errors %}<p class="panel-field__error">{{ error }}</p>{% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-pricing__block" data-pricing="volumes">
+                    <p class="panel-pricing__block-title">Цены по объёму</p>
+                    <p class="panel-hint">Каждая строка — отдельный размер. Пример: 250 мл — 290 ₽, 350 мл — 360 ₽.</p>
+                    {{ formset.management_form }}
+                    <div class="panel-variants__rows" data-variant-rows>
+                        {% for vform in formset %}
+                        {% include 'panel/includes/variant_row.html' with vform=vform %}
+                        {% endfor %}
+                    </div>
+                    <template data-variant-empty>
+                        {% include 'panel/includes/variant_row.html' with vform=formset.empty_form %}
+                    </template>
+                    <button type="button" class="panel-btn panel-btn--ghost" data-add-variant>+ Добавить цену по объёму</button>
+                    {% if formset.non_form_errors %}
+                    <div class="panel-field__error">{{ formset.non_form_errors }}</div>
+                    {% endif %}
+                </div>
+            </section>
         </div>
-        <div class="panel-form__actions">
+
+        <div class="panel-form__actions panel-menu-edit__actions">
             <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
             {% if item %}
             <button type="submit" name="delete" value="1" class="panel-btn panel-btn--danger" onclick="return confirm('Удалить позицию?')">Удалить</button>
@@ -27,10 +135,13 @@
     </form>
 
     {% if item and item.image %}
-    <div class="panel-preview-box">
+    <aside class="panel-menu-edit__preview">
         <p class="panel-field__label">Текущее фото</p>
-        <img src="{{ item.image.url }}" alt="" class="panel-preview">
-    </div>
+        <img src="{{ item.image.url }}" alt="" class="panel-preview panel-preview--menu">
+        <p class="panel-hint">Загрузите новый файл в блоке «Фото», чтобы заменить.</p>
+    </aside>
     {% endif %}
 </div>
+
+<script src="{% static 'js/panel-menu-form.js' %}?v=3"></script>
 {% endblock %}

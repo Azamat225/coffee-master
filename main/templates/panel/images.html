@@ -7,7 +7,7 @@
     <div class="panel-page-header__text">
         <p class="panel-page-header__eyebrow">Медиа</p>
         <h1 class="panel-h1">Изображения сайта</h1>
-        <p class="panel-hint">Главная, блок «О студии», коллаж и галерея. Можно менять фото, подписи и видимость без удаления.</p>
+        <p class="panel-hint">Главная, блок «О студии», коллаж и галерея. Можно добавлять, менять и удалять фото.</p>
     </div>
 </div>
 
@@ -64,8 +64,43 @@
 <section class="panel-section panel-section--card">
     <h2 class="panel-section__title">Коллаж «Наше пространство»</h2>
     <p class="panel-hint panel-section__desc">
-        Меняйте формат, подпись и видимость каждой ячейки. Удалять фото не нужно — просто выключите «Показывать».
+        Фото в начале галереи «Наше пространство». Добавляйте, меняйте, удаляйте — как в блоке галереи ниже.
     </p>
+
+    <form method="post" enctype="multipart/form-data" class="panel-form panel-form--add-card">
+        {% csrf_token %}
+        <input type="hidden" name="mosaic_action" value="add">
+
+        <div class="panel-form__grid">
+            <div class="panel-field">
+                <label class="panel-field__label">Файл</label>
+                <input type="file" name="image" accept="image/*" required>
+            </div>
+            <div class="panel-field">
+                <label class="panel-field__label">Подпись</label>
+                <input type="text" name="alt_text" placeholder="Например: Барная зона">
+            </div>
+            <div class="panel-field">
+                <label class="panel-field__label">Формат</label>
+                <select name="aspect_ratio">
+                    <option value="auto">Авто</option>
+                    <option value="1:1">1:1</option>
+                    <option value="4:3">4:3</option>
+                    <option value="16:9">16:9</option>
+                    <option value="3:4">3:4</option>
+                </select>
+            </div>
+        </div>
+
+        <label class="panel-field panel-field--checkbox">
+            <input type="checkbox" name="is_active" checked>
+            Показывать на сайте
+        </label>
+
+        <div class="panel-form__actions">
+            <button type="submit" class="panel-btn panel-btn--primary">+ Добавить в коллаж</button>
+        </div>
+    </form>
 
     {% if mosaic_photos %}
     <div class="panel-gallery-cards">
@@ -76,23 +111,23 @@
             {% endif %}
 
             <div class="panel-gallery-card__title">
-                <strong>Ячейка {{ photo.slot }}</strong>
-                {% if photo.is_active %}
-                <span class="panel-yes">Видно</span>
-                {% else %}
-                <span class="panel-no">Скрыто</span>
-                {% endif %}
+                <strong>{{ photo.alt_text|default:'Без подписи' }}</strong>
+                <span class="panel-cat">{{ photo.aspect_ratio }}</span>
             </div>
 
             <form method="post" enctype="multipart/form-data" class="panel-form panel-gallery-card__form">
                 {% csrf_token %}
                 <input type="hidden" name="mosaic_action" value="update">
-                <input type="hidden" name="mosaic_slot" value="{{ photo.slot }}">
+                <input type="hidden" name="mosaic_id" value="{{ photo.id }}">
 
                 <div class="panel-form__grid">
                     <div class="panel-field">
                         <label class="panel-field__label">Подпись</label>
-                        <input type="text" name="alt_text" value="{{ photo.alt_text|default:'' }}" placeholder="Например: Барная зона">
+                        <input type="text" name="alt_text" value="{{ photo.alt_text|default:'' }}" placeholder="Подпись">
+                    </div>
+                    <div class="panel-field">
+                        <label class="panel-field__label">Порядок</label>
+                        <input type="number" name="order" value="{{ photo.order|default:0 }}" min="0" step="1">
                     </div>
                     <div class="panel-field">
                         <label class="panel-field__label">Формат</label>
@@ -120,11 +155,18 @@
                     <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
                 </div>
             </form>
+
+            <form method="post" class="panel-gallery-card__delete" onsubmit="return confirm('Удалить фото из коллажа?');">
+                {% csrf_token %}
+                <input type="hidden" name="mosaic_action" value="delete">
+                <input type="hidden" name="mosaic_id" value="{{ photo.id }}">
+                <button type="submit" class="panel-btn panel-btn--danger">Удалить</button>
+            </form>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p class="panel-hint">Пока нет фото коллажа.</p>
+    <p class="panel-hint">Пока нет фото в коллаже.</p>
     {% endif %}
 </section>
 

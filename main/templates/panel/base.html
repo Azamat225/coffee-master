@@ -7,7 +7,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>{% block title %}Панель{% endblock %} — Green Studio</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/panel.css' %}?v=8">
+    <link rel="stylesheet" href="{% static 'css/panel.css' %}?v=13">
     <script>
         try {
             const t = localStorage.getItem('gs-panel-theme');
@@ -25,7 +25,7 @@
         </a>
         <nav class="panel-top__nav">
             <a href="{% url 'panel_dashboard' %}" class="panel-top__link{% if nav == 'panel_dashboard' %} panel-top__link--active{% endif %}">Главная</a>
-            <a href="{% url 'panel_menu_list' %}" class="panel-top__link{% if nav == 'panel_menu_list' or nav == 'panel_menu_add' or nav == 'panel_menu_edit' or nav == 'panel_bulk_prices' %} panel-top__link--active{% endif %}">Меню</a>
+            <a href="{% url 'panel_menu_list' %}" class="panel-top__link{% if nav == 'panel_menu_list' or nav == 'panel_menu_add' or nav == 'panel_menu_edit' or nav == 'panel_bulk_prices' or nav == 'panel_categories' or nav == 'panel_category_add' or nav == 'panel_category_edit' %} panel-top__link--active{% endif %}">Меню</a>
             <a href="{% url 'panel_promotions' %}" class="panel-top__link{% if nav == 'panel_promotions' or nav == 'panel_promotion_add' or nav == 'panel_promotion_edit' %} panel-top__link--active{% endif %}">Акции</a>
             <a href="{% url 'panel_settings' %}" class="panel-top__link{% if nav == 'panel_settings' %} panel-top__link--active{% endif %}">Сайт</a>
             <a href="{% url 'panel_images' %}" class="panel-top__link{% if nav == 'panel_images' %} panel-top__link--active{% endif %}">Фото</a>
