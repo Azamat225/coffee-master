@@ -3,24 +3,34 @@
 {% block title %}{% if item %}Редактировать{% else %}Новая позиция{% endif %}{% endblock %}
 
 {% block content %}
-<div class="panel-head">
-    <h1 class="panel-h1">{% if item %}{{ item.name }}{% else %}Новая позиция{% endif %}</h1>
-    <a href="{% url 'panel_menu_list' %}" class="panel-btn">← Назад</a>
+<div class="panel-page-header">
+    <div class="panel-page-header__text">
+        <p class="panel-page-header__eyebrow">{% if item %}{{ item.category.name }}{% else %}Новая запись{% endif %}</p>
+        <h1 class="panel-h1">{% if item %}{{ item.name }}{% else %}Новая позиция{% endif %}</h1>
+        <p class="panel-hint">Заполните категорию, цену и фото — позиция появится на странице «Меню»{% if item.is_popular %} и в «Хитах» на главной{% endif %}.</p>
+    </div>
+    <a href="{% url 'panel_menu_list' %}" class="panel-btn">← К списку</a>
 </div>
 
-<form method="post" enctype="multipart/form-data" class="panel-form panel-form--wide">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div class="panel-form__actions">
-        <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
-        {% if item %}
-        <button type="submit" name="delete" value="1" class="panel-btn panel-btn--danger" onclick="return confirm('Удалить позицию?')">Удалить</button>
-        {% endif %}
-    </div>
-</form>
+<div class="panel-form-card">
+    <form method="post" enctype="multipart/form-data" class="panel-form panel-form--wide">
+        {% csrf_token %}
+        <div class="panel-form__fields">
+            {% include 'panel/includes/form_fields.html' with form=form %}
+        </div>
+        <div class="panel-form__actions">
+            <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
+            {% if item %}
+            <button type="submit" name="delete" value="1" class="panel-btn panel-btn--danger" onclick="return confirm('Удалить позицию?')">Удалить</button>
+            {% endif %}
+        </div>
+    </form>
 
-{% if item and item.image %}
-<p class="panel-hint">Текущее фото:</p>
-<img src="{{ item.image.url }}" alt="" class="panel-preview">
-{% endif %}
+    {% if item and item.image %}
+    <div class="panel-preview-box">
+        <p class="panel-field__label">Текущее фото</p>
+        <img src="{{ item.image.url }}" alt="" class="panel-preview">
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

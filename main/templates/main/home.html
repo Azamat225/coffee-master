@@ -22,7 +22,10 @@
                     {{ site_settings.hero_title_line1 }}<br>
                     {{ site_settings.hero_title_line2 }}
                 </h1>
-                <a href="{% url 'menu' %}" class="hero__cta">Смотреть меню</a>
+                <div class="hero__actions">
+                    <a href="{% url 'menu' %}" class="gs-btn gs-btn--light">Смотреть меню</a>
+                    <a href="{% url 'contacts' %}" class="gs-btn gs-btn--ghost-light">Как добраться</a>
+                </div>
             </div>
         </div>
     </div>
@@ -33,6 +36,7 @@
     <div class="section__head scroll-rise">
         <p class="section__label">Популярное</p>
         <h2 class="section__title">Хиты меню</h2>
+        <p class="section__desc">Напитки и десерты, которые чаще всего заказывают гости в Green Studio.</p>
     </div>
     <div class="menu-grid menu-grid--compact">
         {% for item in popular_items %}
@@ -57,43 +61,60 @@
 </section>
 {% endif %}
 
-<section class="about-section scroll-rise" id="about">
-    <div class="about-section__content">
-        <div class="section__head scroll-rise">
-            <p class="section__label">Green Studio</p>
-            <h2 class="section__title">О студии</h2>
-        </div>
-        <div class="prose scroll-rise">
-            <p>
-                Green Studio — пространство, где продуманный интерьер встречается
-                с тёплой атмосферой и вниманием к деталям. Мягкий свет, живые растения,
-                бархатные кресла и аромат свежего кофе — место, в котором хочется задержаться.
-            </p>
-            <p>
-                Мы позаботились о каждой мелочи: от удобных зон отдыха
-                до кофейной станции с авторскими напитками.
-                Загляните на Артема 151 и почувствуйте это сами.
-            </p>
-        </div>
-    </div>
-</section>
 
-<section class="studio-moment scroll-rise">
-    <div class="studio-moment__inner">
-        <p class="studio-moment__eyebrow">Между делами</p>
-        <h2 class="studio-moment__title">
-            Здесь не торопят.<br>
-            Здесь <span>остаются</span>.
-        </h2>
-        <p class="studio-moment__text">
-            Утренний эспрессо перед работой, тихий полдень с книгой
-            или вечерний латте с другом — Green Studio всегда на одном адресе.
-        </p>
-        <a href="{% url 'contacts' %}" class="studio-moment__link">Как нас найти</a>
+
+<section class="home-story scroll-rise" id="about">
+    <div class="home-story__inner">
+        <article class="home-about scroll-rise">
+            <div class="home-about__visual">
+                <img
+                    src="{% if site_images.about %}{{ site_images.about.image.url }}{% else %}{% static 'images/gallery/hero.png' %}{% endif %}"
+                    alt="{% if site_images.about %}{{ site_images.about.alt_text|default:'Интерьер Green Studio' }}{% else %}Интерьер Green Studio{% endif %}"
+                    class="home-about__img"
+                >
+            </div>
+            <div class="home-about__copy">
+                <p class="section__label">Пространство</p>
+                <h2 class="section__title home-about__title">О студии</h2>
+                <div class="home-about__prose">
+                    <p>
+                        Green Studio — пространство, где продуманный интерьер встречается
+                        с тёплой атмосферой и вниманием к деталям. Мягкий свет, живые растения,
+                        бархатные кресла и аромат свежего кофе — место, в котором хочется задержаться.
+                    </p>
+                    <p>
+                        Мы позаботились о каждой мелочи: от удобных зон отдыха
+                        до кофейной станции с авторскими напитками.
+                        Загляните к нам и почувствуйте это сами.
+                    </p>
+                </div>
+            </div>
+        </article>
+
+        <article class="home-moment scroll-rise" id="moment">
+            <div class="home-moment__content">
+                <div class="home-moment__lead">
+                    <p class="section__label">Между делами</p>
+                    <blockquote class="home-moment__quote">
+                        Здесь не торопят.<br>
+                        Здесь <em>остаются</em>.
+                    </blockquote>
+                </div>
+                <div class="home-moment__aside">
+                    <p class="home-moment__text">
+                        Утренний эспрессо перед работой, тихий полдень с книгой
+                        или вечерний латте с другом — Green Studio всегда на одном адресе.
+                    </p>
+                    <div class="home-moment__footer">
+                        <a href="{% url 'contacts' %}" class="gs-btn gs-btn--outline gs-btn--sm">Контакты и карта</a>
+                    </div>
+                </div>
+            </div>
+        </article>
     </div>
 </section>
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/scroll-effects.js' %}?v=3"></script>
+<script src="{% static 'js/scroll-effects.js' %}?v=4"></script>
 {% endblock %}

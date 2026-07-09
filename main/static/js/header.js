@@ -71,6 +71,14 @@
         });
     }
 
+    if (siteScroll && header) {
+        function updateHeaderScroll() {
+            header.classList.toggle('site-header--scrolled', siteScroll.scrollTop > 16);
+        }
+        updateHeaderScroll();
+        siteScroll.addEventListener('scroll', updateHeaderScroll, { passive: true });
+    }
+
     document.addEventListener('click', function (event) {
         if (!header || !header.classList.contains('site-header--open')) return;
         if (header.contains(event.target)) return;

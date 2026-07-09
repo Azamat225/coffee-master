@@ -12,7 +12,7 @@ class SiteSettings(models.Model):
     )
     phone = models.CharField('Телефон', max_length=30, default='+7 905 000 64 17')
     address_name = models.CharField('Название в футере', max_length=100, default='Green Studio Кофейня')
-    address_street = models.CharField('Адрес', max_length=200, default='ул. Артема 151, этаж 2')
+    address_street = models.CharField('Адрес', max_length=200, default='ул. Артема 151')
     hours_weekday = models.CharField('Будни', max_length=80, default='Пн – Пт: 9:00 – 21:00')
     hours_weekend = models.CharField('Выходные', max_length=80, default='Сб – Вс: 10:00 – 20:00')
     footer_tagline = models.CharField('Слоган футера', max_length=120, default='С любовью на Артема 151')

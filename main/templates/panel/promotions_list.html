@@ -3,33 +3,45 @@
 {% block title %}Акции{% endblock %}
 
 {% block content %}
-<div class="panel-head">
-    <h1 class="panel-h1">Акции</h1>
+<div class="panel-page-header">
+    <div class="panel-page-header__text">
+        <p class="panel-page-header__eyebrow">Маркетинг</p>
+        <h1 class="panel-h1">Акции</h1>
+        <p class="panel-hint">Скидки на выбранные позиции меню. Активные акции отображаются на сайте.</p>
+    </div>
     <a href="{% url 'panel_promotion_add' %}" class="panel-btn panel-btn--primary">+ Добавить</a>
 </div>
 
-<table class="panel-table">
-    <thead>
-        <tr>
-            <th>Название</th>
-            <th>Скидка</th>
-            <th>Позиции</th>
-            <th>Активна</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for promo in promos %}
-        <tr>
-            <td><strong>{{ promo.title }}</strong></td>
-            <td>{{ promo.discount_percent|floatformat:0 }}%</td>
-            <td>{{ promo.menu_items.count }}</td>
-            <td>{% if promo.is_active %}Да{% else %}Нет{% endif %}</td>
-            <td><a href="{% url 'panel_promotion_edit' promo.pk %}">Изменить</a></td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5">Нет акций.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="panel-table-wrap">
+    <table class="panel-table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Скидка</th>
+                <th>Позиции</th>
+                <th>Статус</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for promo in promos %}
+            <tr class="{% if not promo.is_active %}panel-row--dim{% endif %}">
+                <td><strong>{{ promo.title }}</strong></td>
+                <td><span class="panel-sale">−{{ promo.discount_percent|floatformat:0 }}%</span></td>
+                <td>{{ promo.menu_items.count }} шт.</td>
+                <td>
+                    {% if promo.is_active %}
+                    <span class="panel-yes">Активна</span>
+                    {% else %}
+                    <span class="panel-no">Выкл.</span>
+                    {% endif %}
+                </td>
+                <td><a href="{% url 'panel_promotion_edit' promo.pk %}" class="panel-link">Изменить</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="panel-empty">Нет акций. <a href="{% url 'panel_promotion_add' %}">Создать первую</a></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

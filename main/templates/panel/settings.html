@@ -3,17 +3,24 @@
 {% block title %}Настройки сайта{% endblock %}
 
 {% block content %}
-<div class="panel-head">
-    <h1 class="panel-h1">Настройки сайта</h1>
-</div>
-<p class="panel-hint">Название в шапке, телефон, адрес, график и тексты на главной — всё редактируется здесь.</p>
-
-<form method="post" class="panel-form panel-form--wide panel-form--grid">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div class="panel-form__actions">
-        <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
-        <a href="{% url 'home' %}" target="_blank" class="panel-btn">Открыть сайт</a>
+<div class="panel-page-header">
+    <div class="panel-page-header__text">
+        <p class="panel-page-header__eyebrow">Контент</p>
+        <h1 class="panel-h1">Настройки сайта</h1>
+        <p class="panel-hint">Название в шапке, телефон, адрес, график и тексты на главной — всё редактируется здесь.</p>
     </div>
-</form>
+    <a href="{% url 'home' %}" target="_blank" class="panel-btn">Открыть сайт ↗</a>
+</div>
+
+<div class="panel-form-card">
+    <form method="post" class="panel-form panel-form--wide">
+        {% csrf_token %}
+        <div class="panel-form__fields panel-form__fields--grid">
+            {% include 'panel/includes/form_fields.html' with form=form %}
+        </div>
+        <div class="panel-form__actions">
+            <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

@@ -3,20 +3,34 @@
 {% block title %}{% if promo %}Акция{% else %}Новая акция{% endif %}{% endblock %}
 
 {% block content %}
-<div class="panel-head">
-    <h1 class="panel-h1">{% if promo %}{{ promo.title }}{% else %}Новая акция{% endif %}</h1>
-    <a href="{% url 'panel_promotions' %}" class="panel-btn">← Назад</a>
+<div class="panel-page-header">
+    <div class="panel-page-header__text">
+        <p class="panel-page-header__eyebrow">{% if promo %}Редактирование{% else %}Новая запись{% endif %}</p>
+        <h1 class="panel-h1">{% if promo %}{{ promo.title }}{% else %}Новая акция{% endif %}</h1>
+        <p class="panel-hint">Выберите позиции меню — к ним применится скидка % и они покажут акцию на сайте.</p>
+    </div>
+    <a href="{% url 'panel_promotions' %}" class="panel-btn">← К списку</a>
 </div>
 
-<form method="post" enctype="multipart/form-data" class="panel-form panel-form--wide">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <p class="panel-hint">Выберите позиции меню — к ним применится скидка % и они покажут акцию на сайте.</p>
-    <div class="panel-form__actions">
-        <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
-        {% if promo %}
-        <button type="submit" name="delete" value="1" class="panel-btn panel-btn--danger" onclick="return confirm('Удалить акцию?')">Удалить</button>
-        {% endif %}
+<div class="panel-form-card">
+    <form method="post" enctype="multipart/form-data" class="panel-form panel-form--wide">
+        {% csrf_token %}
+        <div class="panel-form__fields">
+            {% include 'panel/includes/form_fields.html' with form=form %}
+        </div>
+        <div class="panel-form__actions">
+            <button type="submit" class="panel-btn panel-btn--primary">Сохранить</button>
+            {% if promo %}
+            <button type="submit" name="delete" value="1" class="panel-btn panel-btn--danger" onclick="return confirm('Удалить акцию?')">Удалить</button>
+            {% endif %}
+        </div>
+    </form>
+
+    {% if promo and promo.image %}
+    <div class="panel-preview-box">
+        <p class="panel-field__label">Текущее изображение</p>
+        <img src="{{ promo.image.url }}" alt="" class="panel-preview">
     </div>
-</form>
+    {% endif %}
+</div>
 {% endblock %}

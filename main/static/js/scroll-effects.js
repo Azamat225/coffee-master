@@ -15,23 +15,23 @@
             ? { top: 0 }
             : scrollRoot.getBoundingClientRect();
         const scrolled = Math.max(0, scrollRect.top - rect.top);
-        const progress = Math.min(scrolled / (heroH * 0.75), 1);
+        const progress = Math.min(scrolled / (heroH * 0.8), 1);
 
         if (heroContent) {
-            const lift = scrolled * 0.45;
-            const fade = Math.max(0, 1 - progress * 1.15);
+            const lift = scrolled * 0.38;
+            const fade = Math.max(0, 1 - progress * 1.1);
             heroContent.style.transform = 'translate3d(0, ' + (-lift) + 'px, 0)';
             heroContent.style.opacity = String(fade);
         }
 
         if (heroImage) {
-            const scale = 1 + progress * 0.1;
-            const imgY = scrolled * 0.18;
+            const scale = 1 + progress * 0.08;
+            const imgY = scrolled * 0.14;
             heroImage.style.transform = 'scale(' + scale + ') translate3d(0, ' + imgY + 'px, 0)';
         }
 
         if (heroOverlay) {
-            heroOverlay.style.opacity = String(0.85 + progress * 0.15);
+            heroOverlay.style.opacity = String(0.82 + progress * 0.18);
         }
     }
 
@@ -53,8 +53,8 @@
             });
         }, {
             root: scrollRoot === window ? null : scrollRoot,
-            threshold: 0.12,
-            rootMargin: '0px 0px -8% 0px',
+            threshold: 0.08,
+            rootMargin: '0px 0px -6% 0px',
         });
 
         items.forEach(function (el) { observer.observe(el); });

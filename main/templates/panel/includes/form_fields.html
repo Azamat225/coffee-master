@@ -1,0 +1,25 @@
+{% for field in form %}
+{% if field.field.widget.input_type == 'checkbox' and not field.field.widget.allow_multiple_selected %}
+<div class="panel-field panel-field--checkbox{% if field.errors %} panel-field--error{% endif %}">
+    {{ field }}
+    <label class="panel-field__label panel-field__label--inline" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {% if field.help_text %}
+    <p class="panel-field__help">{{ field.help_text }}</p>
+    {% endif %}
+    {% for error in field.errors %}
+    <p class="panel-field__error">{{ error }}</p>
+    {% endfor %}
+</div>
+{% else %}
+<div class="panel-field{% if field.errors %} panel-field--error{% endif %}">
+    <label class="panel-field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}
+    <p class="panel-field__help">{{ field.help_text }}</p>
+    {% endif %}
+    {% for error in field.errors %}
+    <p class="panel-field__error">{{ error }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+{% endfor %}

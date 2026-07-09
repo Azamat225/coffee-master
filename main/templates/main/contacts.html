@@ -10,66 +10,61 @@
     <p class="subpage-hero__desc">Приходите на кофе, работайте в тишине или просто заходите поздороваться.</p>
 </section>
 
-<section class="section contacts-page scroll-rise">
-    <div class="contacts-grid">
-        <article class="contacts-card">
-            <span class="contacts-card__icon">📍</span>
-            <h2>Адрес</h2>
-            <p class="contacts-card__main">{{ site_settings.address_name }}</p>
-            <p>{{ site_settings.address_street }}</p>
-        </article>
+<section class="contacts-page">
+    <div class="contacts-shell">
+        <div class="contacts-hub scroll-rise">
+            <aside class="contacts-hub__aside">
+                <p class="section__label">Локация</p>
+                <h2 class="contacts-hub__title">Как нас найти</h2>
+                <p class="contacts-hub__lead">{{ site_settings.address_street }}</p>
 
-        <article class="contacts-card">
-            <span class="contacts-card__icon">🕐</span>
-            <h2>График</h2>
-            <p>{{ site_settings.hours_weekday }}</p>
-            <p>{{ site_settings.hours_weekend }}</p>
-        </article>
+                <dl class="contacts-details">
+                    <div class="contacts-details__row">
+                        <dt class="contacts-details__label">
+                            <svg class="contacts-details__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                            Адрес
+                        </dt>
+                        <dd>{{ site_settings.address_street }}</dd>
+                    </div>
+                    <div class="contacts-details__row">
+                        <dt class="contacts-details__label">
+                            <svg class="contacts-details__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                            График
+                        </dt>
+                        <dd>{{ site_settings.hours_weekday }}<br>{{ site_settings.hours_weekend }}</dd>
+                    </div>
+                    <div class="contacts-details__row">
+                        <dt class="contacts-details__label">
+                            <svg class="contacts-details__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+                            Телефон
+                        </dt>
+                        <dd><a href="tel:{{ site_settings.phone_href }}">{{ site_settings.phone }}</a></dd>
+                    </div>
+                </dl>
 
-        <article class="contacts-card contacts-card--accent">
-            <span class="contacts-card__icon">📞</span>
-            <h2>Телефон</h2>
-            <a href="tel:{{ site_settings.phone_href }}" class="contacts-card__phone">{{ site_settings.phone }}</a>
-            <p class="contacts-card__hint">Позвоните — подскажем по меню и брони</p>
-        </article>
-    </div>
+                <div class="contacts-hub__actions">
+                    <a href="tel:{{ site_settings.phone_href }}" class="gs-btn gs-btn--primary">Позвонить</a>
+                </div>
+            </aside>
 
-    <div class="contacts-map scroll-rise">
-        <div class="contacts-map__head">
-            <h2 class="contacts-map__title">Как нас найти</h2>
-            <p class="contacts-map__desc">{{ site_settings.address_street }}</p>
+            <div class="contacts-hub__map">
+                <iframe
+                    src="https://yandex.ru/map-widget/v1/?ll=55.901199%2C53.614627&amp;z=17&amp;l=map&amp;pt=55.901199%2C53.614627%2Cpm2rdm"
+                    width="100%"
+                    height="100%"
+                    frameborder="0"
+                    allowfullscreen="true"
+                    title="Green Studio на карте"
+                    loading="lazy"
+                ></iframe>
+            </div>
         </div>
-        <div class="contacts-map__widget">
-            <iframe
-                src="https://yandex.ru/map-widget/v1/?ll=55.901199%2C53.614627&amp;z=17&amp;l=map&amp;pt=55.901199%2C53.614627%2Cpm2rdm"
-                width="100%"
-                height="100%"
-                frameborder="0"
-                allowfullscreen="true"
-                title="Green Studio на карте"
-                loading="lazy"
-            ></iframe>
-        </div>
-        <p class="contacts-map__link-wrap">
-            <a
-                href="https://yandex.ru/maps/?ll=55.901199%2C53.614627&amp;z=17&amp;pt=55.901199%2C53.614627%2Cpm2rdm"
-                class="contacts-map__link"
-                target="_blank"
-                rel="noopener noreferrer"
-            >Открыть в Яндекс Картах</a>
-        </p>
-    </div>
 
-    <div class="contacts-banner scroll-rise">
-        <p class="contacts-banner__tagline">{{ site_settings.footer_tagline }}</p>
-        <div class="contacts-banner__actions">
-            <a href="tel:{{ site_settings.phone_href }}" class="hero__cta">Позвонить</a>
-            <a href="{% url 'menu' %}" class="contacts-banner__link">Смотреть меню</a>
-        </div>
+
     </div>
 </section>
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/scroll-effects.js' %}?v=3"></script>
+<script src="{% static 'js/scroll-effects.js' %}?v=4"></script>
 {% endblock %}

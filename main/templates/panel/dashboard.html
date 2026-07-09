@@ -3,28 +3,37 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<h1 class="panel-h1">Панель управления</h1>
+<div class="panel-page-header">
+    <div class="panel-page-header__text">
+        <p class="panel-page-header__eyebrow">Панель управления</p>
+        <h1 class="panel-h1">Обзор</h1>
+        <p class="panel-hint">Быстрый доступ к меню, акциям и настройкам сайта.</p>
+    </div>
+</div>
 
 <div class="panel-cards">
-    <a href="{% url 'panel_menu_list' %}" class="panel-card">
+    <div class="panel-card panel-card--static">
         <span class="panel-card__num">{{ menu_count }}</span>
         <span class="panel-card__label">Позиций в меню</span>
-    </a>
-    <a href="{% url 'panel_promotions' %}" class="panel-card">
+    </div>
+    <div class="panel-card panel-card--static">
         <span class="panel-card__num">{{ promo_count }}</span>
         <span class="panel-card__label">Активных акций</span>
-    </a>
-    <a href="{% url 'panel_menu_list' %}" class="panel-card">
+    </div>
+    <div class="panel-card panel-card--static">
         <span class="panel-card__num">{% if avg_price %}{{ avg_price|floatformat:0 }}{% else %}—{% endif %}</span>
-        <span class="panel-card__label">Средняя цена, ₽</span>
-    </a>
+        <span class="panel-card__label">Средняя цена</span>
+    </div>
+    <div class="panel-card panel-card--static">
+        <span class="panel-card__num">{{ tag_count }}</span>
+        <span class="panel-card__label">Тегов меню</span>
+    </div>
 </div>
 
-<div class="panel-quick">
-    <a href="{% url 'panel_settings' %}" class="panel-quick__btn">Настройки сайта</a>
-    <a href="{% url 'panel_bulk_prices' %}" class="panel-quick__btn">Массовое изменение цен</a>
-    <a href="{% url 'panel_menu_add' %}" class="panel-quick__btn panel-quick__btn--accent">+ Позиция</a>
-</div>
+
+{% if unavailable_count %}
+<p class="panel-hint panel-hint--warn">⚠ {{ unavailable_count }} позиций скрыто с сайта (выключено «В наличии»).</p>
+{% endif %}
 
 {% if on_sale %}
 <section class="panel-block">
@@ -32,7 +41,7 @@
     <ul class="panel-list">
         {% for item in on_sale %}
         <li>
-            <span>{{ item.name }}</span>
+            <span>{{ item.name }} <span class="panel-cat panel-cat--inline">{{ item.category.name }}</span></span>
             <span class="panel-sale">{{ item.get_effective_price|floatformat:0 }} ₽</span>
             <span class="panel-muted"><s>{{ item.price|floatformat:0 }} ₽</s></span>
         </li>
@@ -40,9 +49,4 @@
     </ul>
 </section>
 {% endif %}
-
-{% if unavailable_count %}
-<p class="panel-hint panel-hint--warn">⚠ {{ unavailable_count }} позиций скрыто с сайта (нет в наличии).</p>
-{% endif %}
-
 {% endblock %}

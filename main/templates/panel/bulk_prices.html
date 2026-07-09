@@ -3,20 +3,24 @@
 {% block title %}Массовые цены{% endblock %}
 
 {% block content %}
-<div class="panel-head">
-    <h1 class="panel-h1">Массовое изменение цен</h1>
-    <a href="{% url 'panel_menu_list' %}" class="panel-btn">← Меню</a>
-</div>
-
-<div class="panel-callout">
-    <p>Поднимите или снизьте цены сразу на все позиции или только в одной категории. Скидочные цены тоже пересчитаются.</p>
-</div>
-
-<form method="post" class="panel-form panel-form--wide">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div class="panel-form__actions">
-        <button type="submit" class="panel-btn panel-btn--primary" onclick="return confirm('Применить изменение цен?')">Применить</button>
+<div class="panel-page-header">
+    <div class="panel-page-header__text">
+        <p class="panel-page-header__eyebrow">Меню</p>
+        <h1 class="panel-h1">Массовое изменение цен</h1>
+        <p class="panel-hint">Поднимите или снизьте цены сразу на все позиции или только в одной категории. Скидочные цены тоже пересчитаются.</p>
     </div>
-</form>
+    <a href="{% url 'panel_menu_list' %}" class="panel-btn">← К меню</a>
+</div>
+
+<div class="panel-form-card panel-form-card--narrow">
+    <form method="post" class="panel-form panel-form--wide">
+        {% csrf_token %}
+        <div class="panel-form__fields">
+            {% include 'panel/includes/form_fields.html' with form=form %}
+        </div>
+        <div class="panel-form__actions">
+            <button type="submit" class="panel-btn panel-btn--primary" onclick="return confirm('Применить изменение цен?')">Применить</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

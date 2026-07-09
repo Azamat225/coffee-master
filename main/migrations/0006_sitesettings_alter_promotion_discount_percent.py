@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('topbar_text', models.CharField(default='Кофе, уют и тишина — добро пожаловать в Green Studio Кофейня', max_length=220, verbose_name='Текст в шапке')),
                 ('phone', models.CharField(default='+7 905 000 64 17', max_length=30, verbose_name='Телефон')),
                 ('address_name', models.CharField(default='Green Studio Кофейня', max_length=100, verbose_name='Название в футере')),
-                ('address_street', models.CharField(default='ул. Артема 151, этаж 2', max_length=200, verbose_name='Адрес')),
+                ('address_street', models.CharField(default='ул. Артема 151', max_length=200, verbose_name='Адрес')),
                 ('hours_weekday', models.CharField(default='Пн – Пт: 9:00 – 21:00', max_length=80, verbose_name='Будни')),
                 ('hours_weekend', models.CharField(default='Сб – Вс: 10:00 – 20:00', max_length=80, verbose_name='Выходные')),
                 ('footer_tagline', models.CharField(default='С любовью на Артема 151', max_length=120, verbose_name='Слоган футера')),
